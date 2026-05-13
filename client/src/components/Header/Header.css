@@ -1,0 +1,47 @@
+.header {
+  width: 100%;
+  padding: 30px 80px;
+  box-sizing: border-box;
+  background: linear-gradient(90deg, #0b3c6d, #145da0);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-inner {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.logo-block {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo-block img {
+  width: 90px;
+  height: 90px;
+
+  object-fit: contain;
+
+  background: white;
+
+  border-radius: 50%;
+
+  padding: 10px;
+}
+
+.logo-block span {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding: 24px 20px;
+  }
+}

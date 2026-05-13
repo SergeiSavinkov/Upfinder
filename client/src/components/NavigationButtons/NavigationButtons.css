@@ -1,0 +1,23 @@
+.navigation-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.navigation-buttons button {
+    width: 120px;
+    height: 40px;
+
+    border: none;
+
+    background: #222;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.navigation-buttons button:hover {
+    background: #444;
+}

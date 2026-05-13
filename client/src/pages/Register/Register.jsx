@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import "./Register.css"
+import Header from "../../components/Header/Header"
 
 function Register() {
     const [form, setForm] = useState({
@@ -40,12 +41,8 @@ function Register() {
 
     return (
         <div className="register-page">
-            <div className="register-header">
-                <div className="register-logo-block">
-                    <img src="/logo.png" alt="logo" />
-                    <span>Univerza na Primorskem</span>
-                </div>
-            </div>
+
+            <Header />
 
             <div className="register-container">
                 <div className="register-box">

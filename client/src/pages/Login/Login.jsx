@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import "./Login.css"
+import Header from "../../components/Header/Header"
 
 function Login() {
     const [form, setForm] = useState({
@@ -32,7 +33,7 @@ function Login() {
 
             setMessage('Login successful')
 
-            navigate('/')
+            navigate('/dashboard')
         } else {
             const err = await res.json()
             setMessage('Error: ' + err.error)
@@ -41,12 +42,7 @@ function Login() {
 
     return (
         <div className="login-page">
-            <div className="header">
-                <div className='logo-block'>
-                    <img src="/logo.png " alt="logo" />
-                    <span>Univerza na Primorskem</span>
-                </div>
-            </div>
+            <Header />
 
             <div className="login-container">
                 <h2>Login</h2>
