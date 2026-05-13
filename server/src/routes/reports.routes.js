@@ -3,6 +3,37 @@ const pool = require('../db/database')
 
 const router = express.Router()
 
+const BASE_SELECT = `
+  SELECT
+    r.id,
+    r.user_id,
+    r.report_type,
+    r.status,
+    r.item_name,
+    r.item_description,
+    r.category_id,
+    r.location_id,
+    r.created_at,
+    r.updated_at,
+    r.image IS NOT NULL AS has_image,
+    c.name AS category_name,
+    l.location_name,
+    l.floor AS location_floor,
+    l.room AS location_room,
+    l.description AS location_description,
+    u.email
+  FROM item_report r
+  JOIN user u ON r.user_id = u.id
+  JOIN category c ON r.category_id = c.id
+  JOIN location l ON r.location_id = l.id
+`
+
+const getIdByName = async (table, field, value) => {
+  if (!value) return null
+  const [rows] = await pool.query(`SELECT id FROM ${table} WHERE ${field} = ?`, [value])
+  return rows[0]?.id
+}
+
 router.post('/', async (req, res) => {
   const {
     user_id,
@@ -18,26 +49,8 @@ router.post('/', async (req, res) => {
   } = req.body
 
   try {
-    let resolvedCategoryId = category_id
-    let resolvedLocationId = location_id
-
-    if (!resolvedCategoryId && category_name) {
-      const [categoryRows] = await pool.query(
-        'SELECT id FROM category WHERE name = ?',
-        [category_name]
-      )
-
-      resolvedCategoryId = categoryRows[0]?.id
-    }
-
-    if (!resolvedLocationId && location_name) {
-      const [locationRows] = await pool.query(
-        'SELECT id FROM location WHERE location_name = ?',
-        [location_name]
-      )
-
-      resolvedLocationId = locationRows[0]?.id
-    }
+    const resolvedCategoryId = category_id || (await getIdByName('category', 'name', category_name))
+    const resolvedLocationId = location_id || (await getIdByName('location', 'location_name', location_name))
 
     const [result] = await pool.query(
       `INSERT INTO item_report
@@ -86,17 +99,9 @@ router.get('/', async (req, res) => {
     const values = []
 
     if (search) {
-      conditions.push(`
-        (
-          r.item_name LIKE ?
-          OR r.item_description LIKE ?
-          OR c.name LIKE ?
-          OR l.location_name LIKE ?
-        )
-      `)
-
+      conditions.push(`(r.item_name LIKE ? OR r.item_description LIKE ? OR c.name LIKE ? OR l.location_name LIKE ? OR l.description LIKE ?)`)
       const searchValue = `%${search}%`
-      values.push(searchValue, searchValue, searchValue, searchValue)
+      values.push(searchValue, searchValue, searchValue, searchValue, searchValue)
     }
 
     if (reportType && reportType !== 'all') {
@@ -129,40 +134,32 @@ router.get('/', async (req, res) => {
       values.push(dateTo)
     }
 
-    const whereClause = conditions.length
-      ? `WHERE ${conditions.join(' AND ')}`
-      : ''
-
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
     const orderDirection = sort === 'oldest' ? 'ASC' : 'DESC'
 
     const [results] = await pool.query(
-      `
-      SELECT
-        r.id,
-        r.user_id,
-        r.report_type,
-        r.status,
-        r.item_name,
-        r.item_description,
-        r.category_id,
-        r.location_id,
-        r.created_at,
-        r.updated_at,
-        r.image IS NOT NULL AS has_image,
-        c.name AS category_name,
-        l.location_name,
-        u.email
-      FROM item_report r
-      JOIN user u ON r.user_id = u.id
-      JOIN category c ON r.category_id = c.id
-      JOIN location l ON r.location_id = l.id
-      ${whereClause}
-      ORDER BY r.created_at ${orderDirection}
-      `,
+      `${BASE_SELECT} ${whereClause} ORDER BY r.created_at ${orderDirection}`,
       values
     )
 
     res.json(results)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.get('/:id', async (req, res) => {
+  try {
+    const [results] = await pool.query(
+      `${BASE_SELECT} WHERE r.id = ?`,
+      [req.params.id]
+    )
+
+    if (!results.length) {
+      return res.status(404).json({ error: 'Report not found' })
+    }
+
+    res.json(results[0])
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -175,7 +172,7 @@ router.get('/:id/image', async (req, res) => {
       [req.params.id]
     )
 
-    if (results.length === 0 || !results[0].image) {
+    if (!results.length || !results[0].image) {
       return res.status(404).json({ error: 'Image not found' })
     }
 

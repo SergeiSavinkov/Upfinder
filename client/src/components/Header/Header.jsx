@@ -1,6 +1,6 @@
 import "./Header.css"
 
-function Header() {
+function Header({ children }) {
     return (
         <header className="header">
             <div className="header-inner">
@@ -9,6 +9,8 @@ function Header() {
 
                     <span>Univerza na Primorskem</span>
                 </div>
+
+                {children}
             </div>
         </header>
     )

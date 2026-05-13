@@ -222,7 +222,17 @@ function Dashboard() {
     }
 
     const openDetails = item => {
-        console.log("Open details:", item)
+        if (item.report_type === "found") {
+            navigate(`/found-item-details/${item.id}`, {
+                state: {item: item}
+            })
+        }
+
+        if (item.report_type === "lost") {
+            navigate(`/lost-item-details/${item.id}`, {
+                state: {item: item}
+            })
+        }
     }
 
     const submitClaim = item => {
