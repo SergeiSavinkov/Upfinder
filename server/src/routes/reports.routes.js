@@ -1,167 +1,172 @@
 const express = require('express')
-const pool = require('../db/database')
+const multer = require('multer')
+const pool = require ('../db/database')
 
 const router = express.Router()
 
-const BASE_SELECT = `
-  SELECT
-    r.id,
-    r.user_id,
-    r.report_type,
-    r.status,
-    r.item_name,
-    r.item_description,
-    r.category_id,
-    r.location_id,
-    r.created_at,
-    r.updated_at,
-    r.image IS NOT NULL AS has_image,
-    c.name AS category_name,
-    l.location_name,
-    l.floor AS location_floor,
-    l.room AS location_room,
-    l.description AS location_description,
-    u.email
-  FROM item_report r
-  JOIN user u ON r.user_id = u.id
-  JOIN category c ON r.category_id = c.id
-  JOIN location l ON r.location_id = l.id
-`
+const upload = multer({
+  storage: multer.memoryStorage()
+})
 
-const getIdByName = async (table, field, value) => {
-  if (!value) return null
-  const [rows] = await pool.query(`SELECT id FROM ${table} WHERE ${field} = ?`, [value])
-  return rows[0]?.id
-}
-
-router.post('/', async (req, res) => {
-  const {
-    user_id,
-    item_name,
-    description,
-    item_description,
-    report_type,
-    category_id,
-    category_name,
-    location_id,
-    location_name,
-    status
-  } = req.body
+router.post('/', upload.single('image'), async (req, res) => {
+  const { user_id, item_name, item_description, report_type, category_id, category_name, location_id, location_name, location_floor, location_room, location_description, status } = req.body
 
   try {
-    const resolvedCategoryId = category_id || (await getIdByName('category', 'name', category_name))
-    const resolvedLocationId = location_id || (await getIdByName('location', 'location_name', location_name))
+    let finalCategoryId = category_id
+    if (!finalCategoryId && category_name) {
+      const [catRows] = await pool.query('SELECT id FROM category WHERE name = ?', [category_name])
+      if (catRows.length) {
+        finalCategoryId = catRows[0].id
+      } else {
+        const [catResult] = await pool.query('INSERT INTO category (name) VALUES (?)', [category_name])
+        finalCategoryId = catResult.insertId
+      }
+    }
+
+    let finalLocationId = location_id
+    if (!finalLocationId && location_name) {
+      const [locRows] = await pool.query('SELECT id FROM location WHERE location_name = ?', [location_name])
+      if (locRows.length) {
+        finalLocationId = locRows[0].id
+      } else {
+        const [locResult] = await pool.query(
+          'INSERT INTO location (location_name, floor, room, description) VALUES (?, ?, ?, ?)',
+          [location_name, location_floor || null, location_room || null, location_description || null]
+        )
+        finalLocationId = locResult.insertId
+      }
+    }
 
     const [result] = await pool.query(
       `INSERT INTO item_report
-        (user_id, item_name, item_description, report_type, category_id, location_id, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        user_id,
-        item_name,
-        item_description || description,
-        report_type,
-        resolvedCategoryId,
-        resolvedLocationId,
-        status || 'open'
-      ]
+      (user_id, item_name, item_description, report_type, category_id, location_id, status, image)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_id, item_name, item_description, report_type, finalCategoryId, finalLocationId, status || 'open', req.file ? req.file.buffer : null]
     )
 
-    res.json({
-      id: result.insertId,
-      user_id,
-      item_name,
-      item_description: item_description || description,
-      report_type,
-      category_id: resolvedCategoryId,
-      location_id: resolvedLocationId,
-      status: status || 'open'
-    })
+    res.json({id: result.insertId, user_id, item_name, item_description, report_type, category_id: finalCategoryId, location_id: finalLocationId, status: status || 'open', has_image: Boolean(req.file)})
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.status(500).json({
+      error: err.message
+    })
   }
 })
 
 router.get('/', async (req, res) => {
   const {
     search,
-    reportType,
-    status,
     category,
-    location,
-    dateFrom,
-    dateTo,
-    sort = 'newest'
+    reportType
   } = req.query
 
   try {
-    const conditions = []
+    let query = `
+    SELECT r.id, r.user_id, r.report_type, r.status, r.item_name, r.item_description, r.created_at, r.image IS NOT NULL AS has_image,
+    c.name AS category_name,
+    l.location_name, l.floor, l.room,
+    u.email
+    FROM item_report r
+    JOIN category c ON r.category_id = c.id
+    JOIN location l ON r.location_id = l.id
+    JOIN user u ON r.user_id = u.id
+    WHERE 1=1
+    `
+    
     const values = []
 
     if (search) {
-      conditions.push(`(r.item_name LIKE ? OR r.item_description LIKE ? OR c.name LIKE ? OR l.location_name LIKE ? OR l.description LIKE ?)`)
+      query += `
+        AND (
+          r.item_name LIKE ?
+          OR r.item_description LIKE ?
+          OR c.name LIKE ?
+          OR l.location_name LIKE ?
+        )
+      `
+
       const searchValue = `%${search}%`
-      values.push(searchValue, searchValue, searchValue, searchValue, searchValue)
+
+      values.push(
+        searchValue,
+        searchValue,
+        searchValue,
+        searchValue
+      )
     }
 
-    if (reportType && reportType !== 'all') {
-      conditions.push('r.report_type = ?')
-      values.push(reportType)
-    }
-
-    if (status && status !== 'all') {
-      conditions.push('r.status = ?')
-      values.push(status)
-    }
-
-    if (category && category !== 'all') {
-      conditions.push('c.name = ?')
+    if (category) {
+      query += ` AND c.name = ?`
       values.push(category)
     }
 
-    if (location && location !== 'all') {
-      conditions.push('l.location_name = ?')
-      values.push(location)
+    if (reportType) {
+      query += ` AND r.report_type = ?`
+      values.push(reportType)
     }
 
-    if (dateFrom) {
-      conditions.push('DATE(r.created_at) >= ?')
-      values.push(dateFrom)
-    }
+    query += ` ORDER BY r.created_at DESC`
 
-    if (dateTo) {
-      conditions.push('DATE(r.created_at) <= ?')
-      values.push(dateTo)
-    }
-
-    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
-    const orderDirection = sort === 'oldest' ? 'ASC' : 'DESC'
-
-    const [results] = await pool.query(
-      `${BASE_SELECT} ${whereClause} ORDER BY r.created_at ${orderDirection}`,
-      values
-    )
+    const [results] = await pool.query(query, values)
 
     res.json(results)
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.status(500).json({
+      error: err.message
+    })
   }
 })
 
 router.get('/:id', async (req, res) => {
   try {
     const [results] = await pool.query(
-      `${BASE_SELECT} WHERE r.id = ?`,
+      `
+      SELECT
+        r.id,
+        r.user_id,
+        r.report_type,
+        r.status,
+        r.item_name,
+        r.item_description,
+        r.created_at,
+        r.updated_at,
+        r.image IS NOT NULL AS has_image,
+
+        c.name AS category_name,
+
+        l.location_name,
+        l.floor,
+        l.room,
+        l.description,
+
+        u.email
+
+      FROM item_report r
+
+      JOIN category c
+        ON r.category_id = c.id
+
+      JOIN location l
+        ON r.location_id = l.id
+
+      JOIN user u
+        ON r.user_id = u.id
+
+      WHERE r.id = ?
+      `,
       [req.params.id]
     )
 
-    if (!results.length) {
-      return res.status(404).json({ error: 'Report not found' })
+    if (results.length === 0) {
+      return res.status(404).json({
+        error: 'Report not found'
+      })
     }
 
     res.json(results[0])
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.status(500).json({
+      error: err.message
+    })
   }
 })
 
@@ -173,13 +178,17 @@ router.get('/:id/image', async (req, res) => {
     )
 
     if (!results.length || !results[0].image) {
-      return res.status(404).json({ error: 'Image not found' })
+      return res.status(404).json({
+        error: 'Image not found'
+      })
     }
 
     res.setHeader('Content-Type', 'image/png')
     res.send(results[0].image)
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.status(500).json({
+      error: err.message
+    })
   }
 })
 

@@ -15,8 +15,7 @@ function Login() {
 
     const handleChange = ({ target: {name, value } }) => {
         setForm(prev => ({
-            ...prev,
-            [name]: value
+            ...prev, [name]: value
         }))
     }
 
@@ -30,6 +29,8 @@ function Login() {
         if (res.ok) {
             const user = await res.json()
             console.log('USER:', user)
+
+            localStorage.setItem("user", JSON.stringify(user))
 
             setMessage('Login successful')
 

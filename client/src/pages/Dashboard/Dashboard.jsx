@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
+import {
+    fetchReports,
+    formatReportDate,
+    getReportDescription,
+    getReportImageUrl
+} from "../../api/reports"
 import "./Dashboard.css"
-
-const API_URL = "http://localhost:5000"
 
 function normalize(value) {
     return String(value || "").toLowerCase().trim()
@@ -13,48 +17,9 @@ function getUniqueOptions(items, key) {
     return [...new Set(items.map(item => item[key]).filter(Boolean))]
 }
 
-function bufferToImageUrl(image) {
-    if (!image?.data?.length) {
-        return ""
-    }
-
-    let binary = ""
-    const bytes = new Uint8Array(image.data)
-
-    bytes.forEach(byte => {
-        binary += String.fromCharCode(byte)
-    })
-
-    return `data:image/png;base64,${btoa(binary)}`
-}
-
-function getItemImageUrl(item) {
-    if (item.image_url) {
-        return item.image_url
-    }
-
-    if (item.has_image) {
-        return `${API_URL}/reports/${item.id}/image`
-    }
-
-    return bufferToImageUrl(item.image)
-}
-
-function formatReportDate(date) {
-    if (!date) {
-        return "Unknown date"
-    }
-
-    return new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-    }).format(new Date(date))
-}
-
 function ItemCard({ item, onDetails, onClaim }) {
     const isFound = item.report_type === "found"
-    const imageUrl = getItemImageUrl(item)
+    const imageUrl = getReportImageUrl(item)
 
     return (
         <article className="item-card">
@@ -74,7 +39,7 @@ function ItemCard({ item, onDetails, onClaim }) {
             </div>
 
             <div className="item-info">
-                <p>{item.description || item.item_description || "No description provided."}</p>
+                <p>{getReportDescription(item)}</p>
 
                 <div className="item-meta">
                     <span>{item.category_name || "No category"}</span>
@@ -92,9 +57,7 @@ function ItemCard({ item, onDetails, onClaim }) {
                 <button onClick={() => onDetails(item)}>Item Details</button>
 
                 {isFound && (
-                    <button className="secondary-action" onClick={() => onClaim(item)}>
-                        Claim
-                    </button>
+                    <button className="secondary-action" onClick={() => onClaim(item)}>Claim</button>
                 )}
             </div>
         </article>
@@ -103,7 +66,6 @@ function ItemCard({ item, onDetails, onClaim }) {
 
 function Dashboard() {
     const navigate = useNavigate()
-    const itemsGridRef = useRef(null)
 
     const [reports, setReports] = useState([])
     const [filteredReports, setFilteredReports] = useState([])
@@ -113,7 +75,6 @@ function Dashboard() {
     const [filters, setFilters] = useState({
         search: "",
         reportType: "all",
-        status: "all",
         category: "all",
         location: "all",
         dateFrom: "",
@@ -122,15 +83,9 @@ function Dashboard() {
     })
 
     useEffect(() => {
-        async function fetchReports() {
+        async function loadReports() {
             try {
-                const res = await fetch(`${API_URL}/reports`)
-
-                if (!res.ok) {
-                    throw new Error("Failed to load reports")
-                }
-
-                const data = await res.json()
+                const data = await fetchReports()
                 setReports(data)
             } catch (err) {
                 setError(err.message)
@@ -139,7 +94,7 @@ function Dashboard() {
             }
         }
 
-        fetchReports()
+        loadReports()
     }, [])
 
     useEffect(() => {
@@ -150,7 +105,7 @@ function Dashboard() {
         if (search) {
             result = result.filter(item => {
                 const name = normalize(item.item_name)
-                const description = normalize(item.description || item.item_description)
+                const description = normalize(getReportDescription(item))
                 const category = normalize(item.category_name)
                 const location = normalize(item.location_name)
 
@@ -165,10 +120,6 @@ function Dashboard() {
 
         if (filters.reportType !== "all") {
             result = result.filter(item => item.report_type === filters.reportType)
-        }
-
-        if (filters.status !== "all") {
-            result = result.filter(item => (item.status || "open") === filters.status)
         }
 
         if (filters.category !== "all") {
@@ -212,7 +163,6 @@ function Dashboard() {
         setFilters({
             search: "",
             reportType: "all",
-            status: "all",
             category: "all",
             location: "all",
             dateFrom: "",
@@ -237,24 +187,6 @@ function Dashboard() {
 
     const submitClaim = item => {
         console.log("Submit claim:", item)
-    }
-
-    const scrollItemsRight = () => {
-        const container = itemsGridRef.current
-
-        if (!container) {
-            return
-        }
-
-        const firstCard = container.querySelector(".item-card")
-        const scrollAmount = firstCard
-            ? firstCard.getBoundingClientRect().width + 24
-            : 360
-
-        container.scrollBy({
-            left: scrollAmount,
-            behavior: "smooth"
-        })
     }
 
     const categories = getUniqueOptions(reports, "category_name")
@@ -282,21 +214,12 @@ function Dashboard() {
 
                         <label>
                             Search
-                            <input
-                                name="search"
-                                value={filters.search}
-                                onChange={handleFilterChange}
-                                placeholder="Name, description, category..."
-                            />
+                            <input name="search" value={filters.search} onChange={handleFilterChange} placeholder="Name, description, category..."/>
                         </label>
 
                         <label>
                             Report type
-                            <select
-                                name="reportType"
-                                value={filters.reportType}
-                                onChange={handleFilterChange}
-                            >
+                            <select name="reportType" value={filters.reportType} onChange={handleFilterChange}>
                                 <option value="all">All</option>
                                 <option value="lost">Lost</option>
                                 <option value="found">Found</option>
@@ -304,27 +227,8 @@ function Dashboard() {
                         </label>
 
                         <label>
-                            Status
-                            <select
-                                name="status"
-                                value={filters.status}
-                                onChange={handleFilterChange}
-                            >
-                                <option value="all">All</option>
-                                <option value="open">Open</option>
-                                <option value="matched">Matched</option>
-                                <option value="returned">Returned</option>
-                                <option value="closed">Closed</option>
-                            </select>
-                        </label>
-
-                        <label>
                             Category
-                            <select
-                                name="category"
-                                value={filters.category}
-                                onChange={handleFilterChange}
-                            >
+                            <select name="category" value={filters.category} onChange={handleFilterChange}>
                                 <option value="all">All</option>
                                 {categories.map(category => (
                                     <option key={category} value={category}>
@@ -336,11 +240,7 @@ function Dashboard() {
 
                         <label>
                             Location
-                            <select
-                                name="location"
-                                value={filters.location}
-                                onChange={handleFilterChange}
-                            >
+                            <select name="location" value={filters.location} onChange={handleFilterChange}>
                                 <option value="all">All</option>
                                 {locations.map(location => (
                                     <option key={location} value={location}>
@@ -352,31 +252,17 @@ function Dashboard() {
 
                         <label>
                             From
-                            <input
-                                type="date"
-                                name="dateFrom"
-                                value={filters.dateFrom}
-                                onChange={handleFilterChange}
-                            />
+                            <input type="date" name="dateFrom" value={filters.dateFrom} onChange={handleFilterChange} />
                         </label>
 
                         <label>
                             To
-                            <input
-                                type="date"
-                                name="dateTo"
-                                value={filters.dateTo}
-                                onChange={handleFilterChange}
-                            />
+                            <input type="date" name="dateTo" value={filters.dateTo} onChange={handleFilterChange} />
                         </label>
 
                         <label>
                             Sort
-                            <select
-                                name="sort"
-                                value={filters.sort}
-                                onChange={handleFilterChange}
-                            >
+                            <select name="sort" value={filters.sort} onChange={handleFilterChange}>
                                 <option value="newest">Newest first</option>
                                 <option value="oldest">Oldest first</option>
                             </select>
@@ -399,7 +285,7 @@ function Dashboard() {
                                 </div>
 
                                 <div className="items-carousel">
-                                    <div className="items-grid" ref={itemsGridRef}>
+                                    <div className="items-grid">
                                         {filteredReports.map(item => (
                                             <ItemCard
                                                 key={item.id}
@@ -409,23 +295,10 @@ function Dashboard() {
                                             />
                                         ))}
                                     </div>
-
-                                    {filteredReports.length > 1 && (
-                                        <button
-                                            className="items-next-button"
-                                            type="button"
-                                            onClick={scrollItemsRight}
-                                            aria-label="Show next item"
-                                        >
-                                            &rarr;
-                                        </button>
-                                    )}
                                 </div>
 
                                 {filteredReports.length === 0 && (
-                                    <p className="dashboard-message">
-                                        No reports match selected filters.
-                                    </p>
+                                    <p className="dashboard-message">No reports match selected filters.</p>
                                 )}
                             </>
                         )}
@@ -434,7 +307,7 @@ function Dashboard() {
 
                 <section className="dashboard-bottom">
                     <button className="chat-button">Chat</button>
-                    <button className="add-report-button">Add Report</button>
+                    <button className="add-report-button" onClick={() => navigate("/create-edit-report")}>Add Report</button>
                 </section>
             </main>
         </div>

@@ -18,8 +18,7 @@ function Register() {
 
     const handleChange = ({ target: { name, value } }) => {
         setForm(prev => ({
-            ...prev,
-            [name]: value
+            ...prev, [name]: value
         }))
     }
 
