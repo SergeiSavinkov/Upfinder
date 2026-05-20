@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard/Dashboard"
 import FoundItemDetails from "./pages/FoundItemDetails/FoundItemDetails"
 import LostItemDetails from "./pages/LostItemDetails/LostItemDetails"
 import CreateEditReport from "./pages/CreateEditReport/CreateEditReport"
+import MyReports from "./pages/MyReports/MyReports"
 
 export default function AppRouter() {
     return (
@@ -14,6 +15,7 @@ export default function AppRouter() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/my-reports" element={<MyReports />} />
                 <Route path="/create-edit-report" element={<CreateEditReport />} />
                 <Route path="/create-edit-report/:id" element={<CreateEditReport />} />
                 <Route path="/found-item-details/:id" element={<FoundItemDetails />} />

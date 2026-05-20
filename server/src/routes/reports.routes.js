@@ -192,4 +192,27 @@ router.get('/:id/image', async (req, res) => {
   }
 })
 
+router.delete('/:id', async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      'DELETE FROM item_report WHERE id = ?',
+      [req.params.id]
+    )
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        error: "Report not found"
+      })
+    }
+
+    res.json({
+      message: "Report deleted"
+    })
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    })
+  }
+})
+
 module.exports = router

@@ -1,0 +1,57 @@
+.my-reports-header-nav {
+  position: absolute;
+  top: 64px;
+  right: max(80px, calc((100vw - 1180px) / 2));
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.my-reports-header-nav button {
+  border: none;
+  background: #1f2937;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  min-width: 112px;
+  height: 36px;
+}
+
+.my-reports-header-nav button:hover {
+  background: #111827;
+}
+
+.my-report-card .item-actions {
+  flex-wrap: wrap;
+}
+
+.my-report-card .item-actions button {
+  flex: 1 1 calc(50% - 5px);
+  min-width: 0;
+}
+
+.my-report-card .item-actions .danger-action {
+  flex-basis: 100%;
+  background: #b42318;
+}
+
+.my-report-card .item-actions .danger-action:hover {
+  background: #7a271a;
+}
+
+@media (max-width: 900px) {
+  .my-reports-header-nav {
+    position: static;
+    width: calc(100% - 40px);
+    margin: 0 auto 24px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
+
+  .my-reports-header-nav button {
+    width: 100%;
+    min-width: 0;
+  }
+}

@@ -106,3 +106,17 @@ export async function createReport(form, userId, imageFile) {
 
     return data
 }
+
+export async function deleteReport(id) {
+    const res = await fetch(`${API_URL}/reports/${id}`, {
+        method: "DELETE"
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+        throw new Error(data.error || "Failed to delete report")
+    }
+
+    return data
+}

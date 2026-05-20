@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
-import {
-    fetchReports,
-    getReportDescription
-} from "../../api/reports"
-import ReportCard from "../../components/ReportCard/ReportCard"
 import ReportFilters from "../../components/ReportFilters/ReportFilters"
-import "./Dashboard.css"
+import {
+    deleteReport as removeReport,
+    fetchReports,
+    formatReportDate,
+    getReportDescription,
+    getReportImageUrl
+} from "../../api/reports"
+import "../Dashboard/Dashboard.css"
+import "../../components/ReportCard/ReportCard.css"
+import "./MyReports.css"
 
 function normalize(value) {
     return String(value || "").toLowerCase().trim()
@@ -17,8 +21,53 @@ function getUniqueOptions(items, key) {
     return [...new Set(items.map(item => item[key]).filter(Boolean))]
 }
 
-function Dashboard() {
+function MyReportCard({ item, onEdit, onReview, onDelete }) {
+    const imageUrl = getReportImageUrl(item)
+
+    return (
+        <article className="item-card my-report-card">
+            <div className="item-card-header">
+                <h3>{item.item_name}</h3>
+                <span className={`item-type ${item.report_type}`}>
+                    {item.report_type}
+                </span>
+            </div>
+
+            <div className="item-image">
+                {imageUrl ? (
+                    <img src={imageUrl} alt={item.item_name} />
+                ) : (
+                    <span>No image</span>
+                )}
+            </div>
+
+            <div className="item-info">
+                <p>{getReportDescription(item)}</p>
+
+                <div className="item-meta">
+                    <span>{item.category_name || "No category"}</span>
+                    <span>{item.location_name || "No location"}</span>
+                    <span>{item.status || "open"}</span>
+                </div>
+
+                <div className="item-footnote">
+                    <small>Created {formatReportDate(item.created_at)}</small>
+                    <small>Reported by {item.email || "unknown user"}</small>
+                </div>
+            </div>
+
+            <div className="item-actions">
+                <button onClick={() => onEdit(item)}>Edit Report</button>
+                <button className="secondary-action" onClick={() => onReview(item)}>Claim / -s Review</button>
+                <button className="danger-action" onClick={() => onDelete(item)}>Delete</button>
+            </div>
+        </article>
+    )
+}
+
+function MyReports() {
     const navigate = useNavigate()
+    const user = JSON.parse(localStorage.getItem("user") || "null")
 
     const [reports, setReports] = useState([])
     const [filteredReports, setFilteredReports] = useState([])
@@ -39,7 +88,7 @@ function Dashboard() {
         async function loadReports() {
             try {
                 const data = await fetchReports()
-                setReports(data)
+                setReports(data.filter(item => item.user_id === user?.id))
             } catch (err) {
                 setError(err.message)
             } finally {
@@ -48,7 +97,7 @@ function Dashboard() {
         }
 
         loadReports()
-    }, [])
+    }, [user?.id])
 
     useEffect(() => {
         let result = [...reports]
@@ -124,39 +173,35 @@ function Dashboard() {
         })
     }
 
-    const openDetails = item => {
-        if (item.report_type === "found") {
-            navigate(`/found-item-details/${item.id}`, {
-                state: {item: item}
-            })
-        }
-
-        if (item.report_type === "lost") {
-            navigate(`/lost-item-details/${item.id}`, {
-                state: {item: item}
-            })
-        }
+    const editReport = item => {
+        navigate(`/create-edit-report/${item.id}`)
     }
 
-    const submitClaim = item => {
-        console.log("Submit claim:", item)
+    const reviewClaim = item => {
+        console.log("Claim / -s Review:", item)
+    }
+
+    const deleteReport = async item => {
+        try {
+            await removeReport(item.id)
+            setReports(prev => prev.filter(report => report.id !== item.id))
+        } catch (err) {
+            setError(err.message)
+        }
     }
 
     const categories = getUniqueOptions(reports, "category_name")
     const locations = getUniqueOptions(reports, "location_name")
 
     return (
-        <div className="dashboard-page">
+        <div className="dashboard-page my-reports-page">
             <div className="dashboard-header-wrap">
                 <Header />
 
-                <nav className="dashboard-header-nav" aria-label="Dashboard navigation">
-                        <button className="nav-my-report" onClick={() => navigate("/my-reports")}>My Report</button>
-                        <button className="nav-leaderboard">Leaderboard</button>
-                        <button className="nav-profile">Profile</button>
-                        <button className="nav-notifications">Notifications</button>
-                        <button className="nav-logout" onClick={() => navigate("/login")}>Log Out</button>
-                        <button className="nav-my-claims">My Claims</button>
+                <nav className="my-reports-header-nav" aria-label="My reports navigation">
+                    <button type="button">Chat</button>
+                    <button type="button" onClick={() => navigate("/dashboard")}>Back</button>
+                    <button type="button" onClick={() => navigate("/login")}>Log Out</button>
                 </nav>
             </div>
 
@@ -171,14 +216,14 @@ function Dashboard() {
                         {!loading && !error && (
                             <>
                                 <div className="items-header">
-                                    <h2>Reports</h2>
+                                    <h2>My Reports</h2>
                                     <span>{filteredReports.length} items</span>
                                 </div>
 
                                 <div className="items-carousel">
                                     <div className="items-grid">
                                         {filteredReports.map(item => (
-                                            <ReportCard key={item.id} item={item} onDetails={openDetails} onClaim={submitClaim} />
+                                            <MyReportCard key={item.id} item={item} onEdit={editReport} onReview={reviewClaim} onDelete={deleteReport} />
                                         ))}
                                     </div>
                                 </div>
@@ -190,14 +235,9 @@ function Dashboard() {
                         )}
                     </section>
                 </section>
-
-                <section className="dashboard-bottom">
-                    <button className="chat-button">Chat</button>
-                    <button className="add-report-button" onClick={() => navigate("/create-edit-report")}>Add Report</button>
-                </section>
             </main>
         </div>
     )
 }
 
-export default Dashboard
+export default MyReports
