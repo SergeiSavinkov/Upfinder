@@ -7,6 +7,7 @@ import LostItemDetails from "./pages/LostItemDetails/LostItemDetails"
 import CreateEditReport from "./pages/CreateEditReport/CreateEditReport"
 import MyReports from "./pages/MyReports/MyReports"
 import Profile from "./pages/Profile/Profile"
+import ClaimForm from "./pages/ClaimForm/ClaimForm"
 
 export default function AppRouter() {
     return (
@@ -20,6 +21,7 @@ export default function AppRouter() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/create-edit-report" element={<CreateEditReport />} />
                 <Route path="/create-edit-report/:id" element={<CreateEditReport />} />
+                <Route path="/claim-form/:id" element={<ClaimForm />} />
                 <Route path="/found-item-details/:id" element={<FoundItemDetails />} />
                 <Route path="/found-item-details" element={<FoundItemDetails />} />
                 <Route path="lost-item-details/:id" element={<LostItemDetails />} />

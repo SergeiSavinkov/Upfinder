@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import {
@@ -25,6 +25,8 @@ const fallbackItem = {
 function FoundItemDetails() {
     const { id } = useParams()
     const { state } = useLocation()
+    const navigate = useNavigate()
+    const user = JSON.parse(localStorage.getItem("user") || "null")
 
     const [item, setItem] = useState(state?.item || fallbackItem)
 
@@ -46,6 +48,7 @@ function FoundItemDetails() {
     const description = getReportDescription(item)
     const locationDetails = getLocationDetails(item)
     const locationDescription = getLocationDescription(item)
+    const isOwnReport = user?.id && item.user_id && Number(user.id) === Number(item.user_id)
 
     return (
         <div className="found-details-page">
@@ -97,10 +100,22 @@ function FoundItemDetails() {
                 </section>
 
                 <div className="found-details-actions">
-                    <button className="found-primary-action">Claim</button>
+                    <button
+                        className="found-primary-action"
+                        disabled={isOwnReport}
+                        onClick={() => navigate(`/claim-form/${item.id}`, {
+                            state: {item: item}
+                        })}
+                    >
+                        Claim
+                    </button>
                     <button className="found-secondary-action">Message</button>
                     <button className="found-secondary-action">Check Matches</button>
                 </div>
+
+                {isOwnReport && (
+                    <p className="found-details-warning">You can't claim a report you created.</p>
+                )}
             </main>
         </div>
     )

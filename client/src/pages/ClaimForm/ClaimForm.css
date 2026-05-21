@@ -1,0 +1,114 @@
+.claim-form-page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+.claim-form-main {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 40px 0 32px;
+}
+
+.claim-form-layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 56px;
+    align-items: start;
+}
+
+.claim-item-card {
+    flex: none;
+    width: 100%;
+}
+
+.claim-input-panel {
+    background: #ffffff;
+    border: 1px solid #d9e2ef;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.claim-input-panel h2 {
+    margin: 0 0 24px;
+    color: #1f2937;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.claim-input-panel label {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #344054;
+    font-weight: 600;
+}
+
+.claim-input-panel textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    border: 1px solid #c8d7ea;
+    border-radius: 6px;
+    padding: 12px;
+    font: inherit;
+    color: #1f2937;
+    background: #ffffff;
+}
+
+.claim-form-message {
+    margin-top: 14px;
+    color: #b42318;
+    font-weight: 600;
+}
+
+.claim-own-report-warning {
+    width: fit-content;
+    margin: 14px 0 0 12px;
+    padding: 10px 14px;
+    background: #fee4e2;
+    border: 1px solid #fda29b;
+    border-radius: 6px;
+    color: #b42318;
+    font-weight: 600;
+}
+
+.claim-form-footer {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 24px 0 40px;
+    border-top: 1px solid #cfd8e3;
+    display: flex;
+    justify-content: center;
+}
+
+.claim-form-footer button {
+    width: min(560px, 100%);
+    border: none;
+    background: #145da0;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.claim-form-footer button:hover:not(:disabled) {
+    background: #0b3c6d;
+    box-shadow: 0 8px 18px rgba(11, 60, 109, 0.18);
+    transform: translateY(-1px);
+}
+
+.claim-form-footer button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 850px) {
+    .claim-form-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}

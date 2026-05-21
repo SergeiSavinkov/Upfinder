@@ -6,8 +6,7 @@ import {
 
 import "./ReportCard.css"
 
-function ReportCard({ item, onDetails, onClaim }) {
-    const isFound = item.report_type === "found"
+function ReportCard({ item, onDetails }) {
     const imageUrl = getReportImageUrl(item)
 
     return (
@@ -44,15 +43,6 @@ function ReportCard({ item, onDetails, onClaim }) {
 
             <div className="item-actions">
                 <button onClick={() => onDetails(item)}>Item Details</button>
-
-                {isFound && (
-                    <button
-                        className="secondary-action"
-                        onClick={() => onClaim(item)}
-                    >
-                        Claim
-                    </button>
-                )}
             </div>
         </article>
     )

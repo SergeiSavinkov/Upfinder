@@ -138,10 +138,6 @@ function Dashboard() {
         }
     }
 
-    const submitClaim = item => {
-        console.log("Submit claim:", item)
-    }
-
     const categories = getUniqueOptions(reports, "category_name")
     const locations = getUniqueOptions(reports, "location_name")
 
@@ -178,7 +174,7 @@ function Dashboard() {
                                 <div className="items-carousel">
                                     <div className="items-grid">
                                         {filteredReports.map(item => (
-                                            <ReportCard key={item.id} item={item} onDetails={openDetails} onClaim={submitClaim} />
+                                            <ReportCard key={item.id} item={item} onDetails={openDetails} />
                                         ))}
                                     </div>
                                 </div>
