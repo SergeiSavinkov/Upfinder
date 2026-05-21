@@ -1,0 +1,114 @@
+.profile-page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+.profile-main {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 32px 0 0;
+    display: flex;
+    justify-content: center;
+}
+
+.profile-form {
+    width: min(620px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px;
+    background: #ffffff;
+    border: 1px solid #d9e2ef;
+    border-radius: 8px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.profile-form h2 {
+    margin: -22px -22px 4px;
+    padding: 16px 22px;
+    background: #1f2937;
+    color: #ffffff;
+    border-radius: 8px 8px 0 0;
+    font-size: 22px;
+}
+
+.profile-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.profile-form input,
+.profile-form select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #cfd8e3;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1f2937;
+    padding: 11px 12px;
+    font: inherit;
+}
+
+.profile-form input:focus,
+.profile-form select:focus {
+    border-color: #145da0;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(20, 93, 160, 0.12);
+}
+
+.profile-message {
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: #e6eef8;
+    color: #145da0;
+    font-weight: 700;
+}
+
+.profile-footer {
+    width: min(1180px, calc(100% - 40px));
+    margin: 28px auto 0;
+    padding: 24px 0 40px;
+    border-top: 1px solid #cfd8e3;
+    display: flex;
+    justify-content: center;
+}
+
+.profile-footer button {
+    min-width: 170px;
+    border: none;
+    border-radius: 6px;
+    padding: 11px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.profile-primary-button {
+    background: #145da0;
+    color: #ffffff;
+}
+
+.profile-primary-button:hover {
+    background: #0b3c6d;
+    box-shadow: 0 8px 18px rgba(11, 60, 109, 0.18);
+    transform: translateY(-1px);
+}
+
+.profile-footer button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 700px) {
+    .profile-footer button {
+        width: 100%;
+    }
+}

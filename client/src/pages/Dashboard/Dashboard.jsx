@@ -153,7 +153,7 @@ function Dashboard() {
                 <nav className="dashboard-header-nav" aria-label="Dashboard navigation">
                         <button className="nav-my-report" onClick={() => navigate("/my-reports")}>My Report</button>
                         <button className="nav-leaderboard">Leaderboard</button>
-                        <button className="nav-profile">Profile</button>
+                        <button className="nav-profile" onClick={() => navigate("/profile")}>Profile</button>
                         <button className="nav-notifications">Notifications</button>
                         <button className="nav-logout" onClick={() => navigate("/login")}>Log Out</button>
                         <button className="nav-my-claims">My Claims</button>

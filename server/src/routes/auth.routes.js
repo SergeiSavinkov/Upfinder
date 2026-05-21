@@ -52,4 +52,29 @@ router.post('/login', async (req, res) => {
   }
 })
 
+router.put('/users/:id', async (req, res) => {
+  const { id } = req.params
+  const { first_name, last_name, email, password, password_hash, role } = req.body
+  const userPassword = password_hash || password || null
+
+  try {
+    const [result] = await pool.query(
+      `UPDATE user SET first_name = ?, last_name = ?, email = ?, role = ?, password_hash = COALESCE(?, password_hash) WHERE id = ?`,
+      [first_name, last_name, email, role || 'student', userPassword, id]
+    )
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    const [users] = await pool.query(
+      'SELECT id, first_name, last_name, email, role FROM user WHERE id = ?', [id]
+    )
+
+    res.json(users[0])
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 module.exports = router

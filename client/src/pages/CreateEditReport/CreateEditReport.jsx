@@ -109,86 +109,85 @@ function CreateEditReport() {
                     <h2>{isEditMode ? "Edit Report" : "Create Report"}</h2>
                     {loading && <p className="create-report-note">Loading report...</p>}
 
-                    <label>
-                        Report name
-                        <input name="item_name" value={form.item_name} onChange={handleChange} placeholder="Item name" />
-                    </label>
+                    <div className="create-report-layout">
+                        <div className="create-report-column">
+                            <label>
+                                Report name
+                                <input name="item_name" value={form.item_name} onChange={handleChange} placeholder="Item name" />
+                            </label>
 
-                    <label>
-                        Report type
-                        <select name="report_type" value={form.report_type} onChange={handleChange}>
-                            <option value="lost">Lost</option>
-                            <option value="found">Found</option>
-                        </select>
-                    </label>
+                            <label>
+                                Report type
+                                <select name="report_type" value={form.report_type} onChange={handleChange}>
+                                    <option value="lost">Lost</option>
+                                    <option value="found">Found</option>
+                                </select>
+                            </label>
 
-                    <label>
-                        Category
-                        <input name="category_name" value={form.category_name} onChange={handleChange} placeholder="Category" />
-                    </label>
+                            <label>
+                                Category
+                                <input name="category_name" value={form.category_name} onChange={handleChange} placeholder="Category" />
+                            </label>
 
-                    <label>
-                        Location
-                        <input name="location_name" value={form.location_name} onChange={handleChange} placeholder="Location" />
-                    </label>
+                            <label>
+                                Location
+                                <input name="location_name" value={form.location_name} onChange={handleChange} placeholder="Location" />
+                            </label>
 
-                    <div className="create-report-field-row">
-                        <label>
-                            Floor
-                            <input name="location_floor" value={form.location_floor} onChange={handleChange} placeholder="Floor" />
-                        </label>
+                            <div className="create-report-field-row">
+                                <label>
+                                    Floor
+                                    <input name="location_floor" value={form.location_floor} onChange={handleChange} placeholder="Floor" />
+                                </label>
 
-                        <label>
-                            Room
-                            <input name="location_room" value={form.location_room} onChange={handleChange} placeholder="Room" />
-                        </label>
+                                <label>
+                                    Room
+                                    <input name="location_room" value={form.location_room} onChange={handleChange} placeholder="Room" />
+                                </label>
+                            </div>
+
+                            <label>
+                                Location details
+                                <textarea name="location_description" value={form.location_description} onChange={handleChange} placeholder="Add a more detailed location description" rows="4" />
+                            </label>
+                        </div>
+
+                        <div className="create-report-column create-report-media-column">
+                            <label>
+                                Image
+                                <input type="file" accept="image/*" onChange={handleImageChange} />
+                            </label>
+
+                            <div className="create-report-image-preview">
+                                {imagePreview ? (
+                                    <img src={imagePreview} alt="Selected item preview" />
+                                ) : (
+                                    <span>No image selected</span>
+                                )}
+                            </div>
+
+                            <label>
+                                Description
+                                <textarea name="item_description" value={form.item_description} onChange={handleChange} placeholder="Describe the item" rows="5" />
+                            </label>
+
+                            <label>
+                                Status
+                                <select name="status" value={form.status} onChange={handleChange}>
+                                    <option value="open">Open</option>
+                                    <option value="matched">Matched</option>
+                                    <option value="returned">Returned</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                            </label>
+                        </div>
                     </div>
-
-                    <label>
-                        Location details
-                        <textarea name="location_description" value={form.location_description} onChange={handleChange} placeholder="Add a more detailed location description" rows="3" />
-                    </label>
-
-                    <label>
-                        Image
-                        <input type="file" accept="image/*" onChange={handleImageChange} />
-                    </label>
-
-                    <div className="create-report-image-preview">
-                        {imagePreview ? (
-                            <img src={imagePreview} alt="Selected item preview" />
-                        ) : (
-                            <span>No image selected</span>
-                        )}
-                    </div>
-
-                    <label>
-                        Description
-                        <textarea name="item_description" value={form.item_description} onChange={handleChange} placeholder="Describe the item" rows="5" />
-                    </label>
-
-                    <label>
-                        Status
-                        <select name="status" value={form.status} onChange={handleChange}>
-                            <option value="open">Open</option>
-                            <option value="matched">Matched</option>
-                            <option value="returned">Returned</option>
-                            <option value="closed">Closed</option>
-                        </select>
-                    </label>
 
                     {message && <p className="create-report-message">{message}</p>}
                 </section>
             </main>
 
             <footer className="create-report-footer">
-                <button
-                    className="create-report-secondary-button"
-                    type="button"
-                    onClick={() => navigate("/dashboard")}
-                >
-                    Back
-                </button>
                 <button
                     className="create-report-primary-button"
                     type="button"
