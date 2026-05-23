@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
+import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import ReportFilters from "../../components/ReportFilters/ReportFilters"
-import {
-    deleteReport as removeReport,
-    fetchReports,
-    formatReportDate,
-    getReportDescription,
-    getReportImageUrl
-} from "../../api/reports"
+import { deleteReport as removeReport, fetchReports, formatReportDate, getReportDescription, getReportImageUrl } from "../../api/reports"
 import "../Dashboard/Dashboard.css"
 import "../../components/ReportCard/ReportCard.css"
 import "./MyReports.css"
@@ -58,7 +53,9 @@ function MyReportCard({ item, onEdit, onReview, onDelete }) {
 
             <div className="item-actions">
                 <button onClick={() => onEdit(item)}>Edit Report</button>
-                <button className="secondary-action" onClick={() => onReview(item)}>Claim / -s Review</button>
+                {item.report_type === "found" && (
+                    <button className="secondary-action" onClick={() => onReview(item)}>Claim / -s Review</button>
+                )}
                 <button className="danger-action" onClick={() => onDelete(item)}>Delete</button>
             </div>
         </article>
@@ -178,7 +175,9 @@ function MyReports() {
     }
 
     const reviewClaim = item => {
-        console.log("Claim / -s Review:", item)
+        navigate(`/claim-review/${item.id}`, {
+            state: { item }
+        })
     }
 
     const deleteReport = async item => {
@@ -196,13 +195,12 @@ function MyReports() {
     return (
         <div className="dashboard-page my-reports-page">
             <div className="dashboard-header-wrap">
-                <Header />
-
-                <nav className="my-reports-header-nav" aria-label="My reports navigation">
-                    <button type="button">Chat</button>
-                    <button type="button" onClick={() => navigate("/dashboard")}>Back</button>
-                    <button type="button" onClick={() => navigate("/login")}>Log Out</button>
-                </nav>
+                <Header>
+                    <div className="my-reports-header-nav" aria-label="My reports navigation">
+                        <button type="button">Chat</button>
+                        <NavigationButtons backTo="/dashboard" />
+                    </div>
+                </Header>
             </div>
 
             <main className="dashboard-main">

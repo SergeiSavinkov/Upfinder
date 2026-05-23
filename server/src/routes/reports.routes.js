@@ -193,25 +193,43 @@ router.get('/:id/image', async (req, res) => {
 })
 
 router.delete('/:id', async (req, res) => {
+  const connection = await pool.getConnection()
+
   try {
-    const [result] = await pool.query(
+    await connection.beginTransaction()
+
+    const [claimsResult] = await connection.query(
+      'DELETE FROM claim WHERE item_report_id = ?',
+      [req.params.id]
+    )
+
+    const [result] = await connection.query(
       'DELETE FROM item_report WHERE id = ?',
       [req.params.id]
     )
 
     if (result.affectedRows === 0) {
+      await connection.rollback()
+
       return res.status(404).json({
         error: "Report not found"
       })
     }
 
+    await connection.commit()
+
     res.json({
-      message: "Report deleted"
+      message: "Report deleted",
+      deletedClaims: claimsResult.affectedRows
     })
   } catch (err) {
+    await connection.rollback()
+
     res.status(500).json({
       error: err.message
     })
+  } finally {
+    connection.release()
   }
 })
 

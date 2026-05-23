@@ -2,26 +2,49 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
-import {
-    fetchReportById,
-    formatReportDate,
-    getReportDescription,
-    getReportImageUrl
-} from "../../api/reports"
+import { API_URL, fetchReportById, formatReportDate, getReportDescription, getReportImageUrl } from "../../api/reports"
 import "../../components/ReportCard/ReportCard.css"
 import "./ClaimForm.css"
 
+async function readApiResponse(res, fallbackMessage) {
+    const contentType = res.headers.get("content-type") || ""
+
+    if (contentType.includes("application/json")) {
+        const data = await res.json()
+
+        if (!res.ok) {
+            throw new Error(data.error || fallbackMessage)
+        }
+
+        return data
+    }
+
+    if (!res.ok) {
+        throw new Error(`${fallbackMessage}. API returned ${res.status} ${res.statusText}. Restart the server if this route was just added.`)
+    }
+
+    return null
+}
+
+async function fetchClaimById(claimId) {
+    const res = await fetch(`${API_URL}/claims/${claimId}`)
+    return readApiResponse(res, "Failed to load claim")
+}
+
 function ClaimForm() {
-    const { id } = useParams()
+    const { id, claimId } = useParams()
     const { state } = useLocation()
     const navigate = useNavigate()
     const user = JSON.parse(localStorage.getItem("user") || "null")
 
     const [item, setItem] = useState(state?.item || null)
-    const [description, setDescription] = useState("")
+    const [claim, setClaim] = useState(state?.claim || null)
+    const [description, setDescription] = useState(state?.claim?.description || "")
     const [message, setMessage] = useState("")
     const [loading, setLoading] = useState(!state?.item)
     const [submitting, setSubmitting] = useState(false)
+    const activeClaimId = claimId || claim?.id
+    const isEditMode = Boolean(activeClaimId)
 
     useEffect(() => {
         if (!id) return
@@ -31,6 +54,17 @@ function ClaimForm() {
             .catch(err => setMessage("Error: " + err.message))
             .finally(() => setLoading(false))
     }, [id])
+
+    useEffect(() => {
+        if (!claimId || state?.claim) return
+
+        fetchClaimById(claimId)
+            .then(data => {
+                setClaim(data)
+                setDescription(data.description || "")
+            })
+            .catch(err => setMessage("Error: " + err.message))
+    }, [claimId, state?.claim])
 
     const submitClaim = async () => {
         setMessage("")
@@ -53,25 +87,24 @@ function ClaimForm() {
         setSubmitting(true)
 
         try {
-            const res = await fetch("http://localhost:5000/claims", {
-                method: "POST",
+            const res = await fetch(`${API_URL}/claims${isEditMode ? `/${activeClaimId}` : ""}`, {
+                method: isEditMode ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
+                body: JSON.stringify(isEditMode ? {
+                    claimant_id: user.id,
+                    description
+                } : {
                     item_report_id: item.id,
                     claimant_id: user.id,
                     description
                 })
             })
 
-            const data = await res.json()
+            await readApiResponse(res, `Failed to ${isEditMode ? "update" : "create"} claim`)
 
-            if (!res.ok) {
-                throw new Error(data.error || "Failed to create claim")
-            }
-
-            navigate("/dashboard")
+            navigate(isEditMode ? "/my-claims" : "/dashboard")
         } catch (err) {
             setMessage("Error: " + err.message)
         } finally {
@@ -126,11 +159,11 @@ function ClaimForm() {
                         </article>
 
                         <section className="claim-input-panel">
-                            <h2>Claim Input</h2>
+                            <h2>{isEditMode ? "Edit Claim" : "Claim Input"}</h2>
 
                             <label>
-                                Why do you think this item is yours?
-                                <textarea value={description} onChange={event => setDescription(event.target.value)} placeholder="Describe unique details, proof of ownership, or where you lost it" rows="8"/>
+                                {isEditMode ? "Update your claim description" : "Why do you think this item is yours?"}
+                                <textarea value={description} onChange={event => setDescription(event.target.value)} placeholder="Describe unique details, proof of ownership, or where you lost it" rows="8" />
                             </label>
 
                             {message && <p className="claim-form-message">{message}</p>}
@@ -144,7 +177,7 @@ function ClaimForm() {
 
             <footer className="claim-form-footer">
                 <button type="button" onClick={submitClaim} disabled={!item || submitting || isOwnReport}>
-                    {submitting ? "Submitting..." : "Add Claim"}
+                    {submitting ? "Saving..." : isEditMode ? "Save Claim" : "Add Claim"}
                 </button>
             </footer>
         </div>

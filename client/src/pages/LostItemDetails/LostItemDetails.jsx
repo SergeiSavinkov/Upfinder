@@ -2,14 +2,7 @@ import { useEffect, useState } from "react"
 import { useLocation, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
-import {
-    fetchReportById,
-    formatReportDate,
-    getLocationDescription,
-    getLocationDetails,
-    getReportDescription,
-    getReportImageUrl
-} from "../../api/reports"
+import { fetchReportById, formatReportDate, getLocationDescription, getLocationDetails, getReportDescription, getReportImageUrl } from "../../api/reports"
 import "./LostItemDetails.css"
 
 const fallbackItem = {

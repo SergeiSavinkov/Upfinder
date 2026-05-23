@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
-import {
-    fetchReports,
-    getReportDescription
-} from "../../api/reports"
+import { fetchReports, getReportDescription } from "../../api/reports"
 import ReportCard from "../../components/ReportCard/ReportCard"
 import ReportFilters from "../../components/ReportFilters/ReportFilters"
 import "./Dashboard.css"
@@ -127,13 +124,13 @@ function Dashboard() {
     const openDetails = item => {
         if (item.report_type === "found") {
             navigate(`/found-item-details/${item.id}`, {
-                state: {item: item}
+                state: { item: item }
             })
         }
 
         if (item.report_type === "lost") {
             navigate(`/lost-item-details/${item.id}`, {
-                state: {item: item}
+                state: { item: item }
             })
         }
     }
@@ -147,12 +144,12 @@ function Dashboard() {
                 <Header />
 
                 <nav className="dashboard-header-nav" aria-label="Dashboard navigation">
-                        <button className="nav-my-report" onClick={() => navigate("/my-reports")}>My Report</button>
-                        <button className="nav-leaderboard">Leaderboard</button>
-                        <button className="nav-profile" onClick={() => navigate("/profile")}>Profile</button>
-                        <button className="nav-notifications">Notifications</button>
-                        <button className="nav-logout" onClick={() => navigate("/login")}>Log Out</button>
-                        <button className="nav-my-claims">My Claims</button>
+                    <button className="nav-my-report" onClick={() => navigate("/my-reports")}>My Report</button>
+                    <button className="nav-leaderboard">Leaderboard</button>
+                    <button className="nav-profile" onClick={() => navigate("/profile")}>Profile</button>
+                    <button className="nav-notifications">Notifications</button>
+                    <button className="nav-logout" onClick={() => navigate("/login")}>Log Out</button>
+                    <button className="nav-my-claims" onClick={() => navigate("/my-claims")}>My Claims</button>
                 </nav>
             </div>
 

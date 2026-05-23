@@ -2,14 +2,7 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
-import {
-    fetchReportById,
-    formatReportDate,
-    getLocationDescription,
-    getLocationDetails,
-    getReportDescription,
-    getReportImageUrl
-} from "../../api/reports"
+import { fetchReportById, formatReportDate, getLocationDescription, getLocationDetails, getReportDescription, getReportImageUrl } from "../../api/reports"
 import "./FoundItemDetails.css"
 
 const fallbackItem = {
@@ -104,7 +97,7 @@ function FoundItemDetails() {
                         className="found-primary-action"
                         disabled={isOwnReport}
                         onClick={() => navigate(`/claim-form/${item.id}`, {
-                            state: {item: item}
+                            state: { item: item }
                         })}
                     >
                         Claim

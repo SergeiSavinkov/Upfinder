@@ -1,0 +1,188 @@
+.claim-review-main {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 28px 0 48px;
+}
+
+.claim-review-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.claim-review-title h2 {
+    margin: 0;
+    color: #0b3c6d;
+}
+
+.claim-review-title p {
+    margin: 6px 0 0;
+    color: #344054;
+    font-weight: 600;
+}
+
+.claim-review-title span {
+    color: #667085;
+    font-size: 14px;
+}
+
+.claim-review-list {
+    display: grid;
+    gap: 14px;
+}
+
+.claim-review-card {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 18px;
+    padding: 22px 24px;
+    background: #ffffff;
+    border: 1px solid #d9e2ef;
+    border-left: 4px solid #145da0;
+    border-radius: 8px;
+    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
+}
+
+.claim-review-number {
+    width: 34px;
+    height: 34px;
+    margin-top: 2px;
+    background: #145da0;
+    color: #ffffff;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 6px 14px rgba(20, 93, 160, 0.22);
+}
+
+.claim-review-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 24px;
+    row-gap: 10px;
+    align-items: start;
+}
+
+.claim-review-card-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.claim-review-card-header h3 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 18px;
+}
+
+.claim-review-status {
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.claim-review-status.approved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.claim-review-status.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.claim-review-content p {
+    grid-column: 1;
+    margin: 0;
+    color: #344054;
+    line-height: 1.5;
+}
+
+.claim-review-meta {
+    grid-column: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.claim-review-meta span {
+    background: #e5e7eb;
+    color: #344054;
+    padding: 7px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.claim-review-actions {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: center;
+    display: grid;
+    gap: 10px;
+}
+
+.claim-review-actions button {
+    min-width: 120px;
+    border: none;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.approve-claim-button {
+    background: #15803d;
+}
+
+.approve-claim-button:hover:not(:disabled) {
+    background: #166534;
+}
+
+.reject-claim-button {
+    background: #b42318;
+}
+
+.reject-claim-button:hover:not(:disabled) {
+    background: #7a271a;
+}
+
+.claim-review-actions button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+    .claim-review-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .claim-review-card {
+        grid-template-columns: 1fr;
+    }
+
+    .claim-review-content {
+        grid-template-columns: 1fr;
+    }
+
+    .claim-review-content p,
+    .claim-review-meta,
+    .claim-review-actions {
+        grid-column: 1;
+    }
+
+    .claim-review-actions {
+        grid-row: auto;
+        justify-self: start;
+    }
+}
