@@ -2,9 +2,33 @@ import { useEffect, useState } from "react"
 import { useLocation, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
-import { API_URL, fetchReportById, formatReportDate } from "../../api/reports"
 import "../Dashboard/Dashboard.css"
 import "./ClaimReview.css"
+
+const API_URL = "http://localhost:5000"
+
+function formatReportDate(date) {
+    if (!date) {
+        return "Unknown date"
+    }
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    }).format(new Date(date))
+}
+
+async function fetchReportById(reportId) {
+    const res = await fetch(`${API_URL}/reports/${reportId}`)
+    const data = await res.json()
+
+    if (!res.ok) {
+        throw new Error(data.error || "Failed to load report")
+    }
+
+    return data
+}
 
 async function fetchReportClaims(reportId) {
     const res = await fetch(`${API_URL}/claims/report/${reportId}`)
@@ -49,7 +73,7 @@ function ClaimReview() {
         async function loadReview() {
             try {
                 const [reportData, claimsData] = await Promise.all([
-                    item ? Promise.resolve(item) : fetchReportById(id),
+                    state?.item ? Promise.resolve(state.item) : fetchReportById(id),
                     fetchReportClaims(id)
                 ])
 
@@ -63,7 +87,7 @@ function ClaimReview() {
         }
 
         loadReview()
-    }, [id])
+    }, [id, state?.item])
 
     const changeStatus = async (claim, status) => {
         try {

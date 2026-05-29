@@ -2,9 +2,22 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
-import { API_URL, formatReportDate } from "../../api/reports"
 import "../Dashboard/Dashboard.css"
 import "./MyClaims.css"
+
+const API_URL = "http://localhost:5000"
+
+function formatReportDate(date) {
+    if (!date) {
+        return "Unknown date"
+    }
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    }).format(new Date(date))
+}
 
 async function fetchUserClaims(userId) {
     const res = await fetch(`${API_URL}/claims/user/${userId}`)

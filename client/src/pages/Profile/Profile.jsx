@@ -1,8 +1,9 @@
 import { useState } from "react"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
-import { updateUserProfile } from "../../api/auth"
 import "./Profile.css"
+
+const API_URL = "http://localhost:5000"
 
 function Profile() {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null")
@@ -41,7 +42,27 @@ function Profile() {
         setSubmitting(true)
 
         try {
-            const updatedUser = await updateUserProfile(savedUser.id, form)
+            const body = {
+                first_name: form.first_name,
+                last_name: form.last_name,
+                email: form.email,
+                role: form.role
+            }
+
+            if (form.password) {
+                body.password = form.password
+            }
+
+            const res = await fetch(`${API_URL}/auth/users/${savedUser.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            })
+            const updatedUser = await res.json()
+
+            if (!res.ok) {
+                throw new Error(updatedUser.error || "Failed to update profile")
+            }
 
             localStorage.setItem("user", JSON.stringify(updatedUser))
             setMessage("Profile updated successfully.")

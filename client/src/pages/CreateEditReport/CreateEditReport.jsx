@@ -2,8 +2,72 @@ import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
-import { createReport, fetchReportById, getReportImageUrl } from "../../api/reports"
 import "./CreateEditReport.css"
+
+const API_URL = "http://localhost:5000"
+
+function getUniqueOptions(items, key) {
+    return [...new Set(items.map(item => item[key]).filter(Boolean))]
+}
+
+function getReportImageUrl(report) {
+    return report.has_image ? `${API_URL}/reports/${report.id}/image` : ""
+}
+
+function SuggestInput({ label, name, value, placeholder, options, onChange }) {
+    const [open, setOpen] = useState(false)
+
+    const filteredOptions = options.filter(option => {
+        return option.toLowerCase().includes(value.toLowerCase())
+    })
+
+    const selectOption = option => {
+        onChange({
+            target: {
+                name,
+                value: option
+            }
+        })
+        setOpen(false)
+    }
+
+    return (
+        <label className="create-report-suggest-field">
+            {label}
+
+            <div className="create-report-suggest">
+                <input
+                    name={name}
+                    value={value}
+                    onChange={event => {
+                        onChange(event)
+                        setOpen(true)
+                    }}
+                    onFocus={() => setOpen(true)}
+                    onBlur={() => {
+                        setTimeout(() => setOpen(false), 120)
+                    }}
+                    placeholder={placeholder}
+                    autoComplete="off"
+                />
+
+                <button type="button" className="create-report-suggest-toggle" onMouseDown={event => event.preventDefault()} onClick={() => setOpen(prev => !prev)}>
+                    v
+                </button>
+
+                {open && filteredOptions.length > 0 && (
+                    <div className="create-report-suggest-menu">
+                        {filteredOptions.map(option => (
+                            <button key={option} type="button" onMouseDown={event => event.preventDefault()} onClick={() => selectOption(option)}>
+                                {option}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </label>
+    )
+}
 
 function CreateEditReport() {
     const navigate = useNavigate()
@@ -18,12 +82,11 @@ function CreateEditReport() {
         report_type: "lost",
         category_name: "",
         location_name: "",
-        location_floor: "",
-        location_room: "",
-        location_description: "",
         status: "open"
     })
 
+    const [categories, setCategories] = useState([])
+    const [locations, setLocations] = useState([])
     const [message, setMessage] = useState("")
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState("")
@@ -31,11 +94,36 @@ function CreateEditReport() {
     const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
+        async function loadOptions() {
+            try {
+                const res = await fetch(`${API_URL}/reports`)
+                const reports = await res.json()
+
+                if (!res.ok) {
+                    throw new Error(reports.error || "Failed to load reports")
+                }
+
+                setCategories(getUniqueOptions(reports, "category_name"))
+                setLocations(getUniqueOptions(reports, "location_name"))
+            } catch (err) {
+                setMessage("Error: " + err.message)
+            }
+        }
+
+        loadOptions()
+    }, [])
+
+    useEffect(() => {
         if (!isEditMode) return
 
         async function fetchReport() {
             try {
-                const data = await fetchReportById(id)
+                const res = await fetch(`${API_URL}/reports/${id}`)
+                const data = await res.json()
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Failed to load report")
+                }
 
                 setForm({
                     item_name: data.item_name || "",
@@ -43,9 +131,6 @@ function CreateEditReport() {
                     report_type: data.report_type || "lost",
                     category_name: data.category_name || "",
                     location_name: data.location_name || "",
-                    location_floor: data.location_floor || "",
-                    location_room: data.location_room || "",
-                    location_description: data.location_description || "",
                     status: data.status || "open"
                 })
                 setImagePreview(getReportImageUrl(data))
@@ -89,7 +174,45 @@ function CreateEditReport() {
         setSubmitting(true)
 
         try {
-            await createReport(form, user?.id, imageFile)
+            const body = new FormData()
+
+            if (!isEditMode) {
+                body.append("user_id", user?.id)
+            }
+
+            body.append("item_name", form.item_name)
+            body.append("item_description", form.item_description)
+            body.append("report_type", form.report_type)
+            body.append("category_name", form.category_name)
+            body.append("location_name", form.location_name)
+            body.append("status", form.status)
+
+            if (imageFile) {
+                body.append("image", imageFile)
+            }
+
+            if (isEditMode) {
+                const res = await fetch(`${API_URL}/reports/${id}`, {
+                    method: "PUT",
+                    body
+                })
+                const data = await res.json()
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Failed to update report")
+                }
+            } else {
+                const res = await fetch(`${API_URL}/reports`, {
+                    method: "POST",
+                    body
+                })
+                const data = await res.json()
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Failed to create report")
+                }
+            }
+
             navigate("/dashboard")
         } catch (err) {
             setMessage("Error: " + err.message)
@@ -124,32 +247,9 @@ function CreateEditReport() {
                                 </select>
                             </label>
 
-                            <label>
-                                Category
-                                <input name="category_name" value={form.category_name} onChange={handleChange} placeholder="Category" />
-                            </label>
+                            <SuggestInput label="Category" name="category_name" value={form.category_name} placeholder="Category" options={categories} onChange={handleChange} />
 
-                            <label>
-                                Location
-                                <input name="location_name" value={form.location_name} onChange={handleChange} placeholder="Location" />
-                            </label>
-
-                            <div className="create-report-field-row">
-                                <label>
-                                    Floor
-                                    <input name="location_floor" value={form.location_floor} onChange={handleChange} placeholder="Floor" />
-                                </label>
-
-                                <label>
-                                    Room
-                                    <input name="location_room" value={form.location_room} onChange={handleChange} placeholder="Room" />
-                                </label>
-                            </div>
-
-                            <label>
-                                Location details
-                                <textarea name="location_description" value={form.location_description} onChange={handleChange} placeholder="Add a more detailed location description" rows="4" />
-                            </label>
+                            <SuggestInput label="Location" name="location_name" value={form.location_name} placeholder="Location" options={locations} onChange={handleChange} />
                         </div>
 
                         <div className="create-report-column create-report-media-column">
@@ -175,7 +275,6 @@ function CreateEditReport() {
                                 Status
                                 <select name="status" value={form.status} onChange={handleChange}>
                                     <option value="open">Open</option>
-                                    <option value="matched">Matched</option>
                                     <option value="returned">Returned</option>
                                     <option value="closed">Closed</option>
                                 </select>

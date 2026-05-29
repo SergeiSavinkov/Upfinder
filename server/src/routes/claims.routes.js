@@ -3,7 +3,7 @@ const pool = require('../db/database')
 
 const router = express.Router()
 
-router.post('/', async (req, res) => {
+const createClaim = async (req, res) => {
     const { item_report_id, claimant_id, description } = req.body
 
     if (!item_report_id || !claimant_id) {
@@ -31,11 +31,11 @@ router.post('/', async (req, res) => {
             error: err.message
         })
     }
-})
+}
 
-router.get('/user/:userId', async (req, res) => {
+const getUserClaims = async (req, res) => {
     try {
-        const [results] = await pool.query(
+        const [claims] = await pool.query(
             `SELECT c.id, c.item_report_id, c.claimant_id, c.description, c.status, c.created_at,
             r.item_name, r.item_description, r.report_type, r.image IS NOT NULL AS has_image,
             u.email AS claimant_email
@@ -49,22 +49,20 @@ router.get('/user/:userId', async (req, res) => {
             WHERE c.claimant_id = ?
 
             ORDER BY c.created_at DESC`,
-
             [req.params.userId]
         )
 
-        res.json(results)
-
+        res.json(claims)
     } catch (err) {
         res.status(500).json({
             error: err.message
         })
     }
-})
+}
 
-router.get('/report/:reportId', async (req, res) => {
+const getReportClaims = async (req, res) => {
     try {
-        const [results] = await pool.query(
+        const [claims] = await pool.query(
             `SELECT c.id, c.item_report_id, c.claimant_id, c.description, c.status, c.created_at,
             r.item_name, r.item_description, r.report_type,
             u.email AS claimant_email
@@ -78,22 +76,20 @@ router.get('/report/:reportId', async (req, res) => {
             WHERE c.item_report_id = ?
 
             ORDER BY c.created_at DESC`,
-
             [req.params.reportId]
         )
 
-        res.json(results)
-
+        res.json(claims)
     } catch (err) {
         res.status(500).json({
             error: err.message
         })
     }
-})
+}
 
-router.get('/:id', async (req, res) => {
+const getClaimById = async (req, res) => {
     try {
-        const [results] = await pool.query(
+        const [claims] = await pool.query(
             `SELECT c.id, c.item_report_id, c.claimant_id, c.description, c.status, c.created_at,
             r.item_name, r.item_description, r.report_type, r.image IS NOT NULL AS has_image,
             u.email AS claimant_email
@@ -105,26 +101,24 @@ router.get('/:id', async (req, res) => {
             JOIN user u ON c.claimant_id = u.id
 
             WHERE c.id = ?`,
-
             [req.params.id]
         )
 
-        if (results.length === 0) {
+        if (claims.length === 0) {
             return res.status(404).json({
                 error: 'Claim not found'
             })
         }
 
-        res.json(results[0])
-
+        res.json(claims[0])
     } catch (err) {
         res.status(500).json({
             error: err.message
         })
     }
-})
+}
 
-router.patch('/:id/status', async (req, res) => {
+const updateClaimStatus = async (req, res) => {
     const { status } = req.body
 
     if (!['pending', 'approved', 'rejected'].includes(status)) {
@@ -151,15 +145,14 @@ router.patch('/:id/status', async (req, res) => {
             id: Number(req.params.id),
             status
         })
-
     } catch (err) {
         res.status(500).json({
             error: err.message
         })
     }
-})
+}
 
-router.put('/:id', async (req, res) => {
+const updateClaim = async (req, res) => {
     const { claimant_id, description } = req.body
 
     if (!claimant_id) {
@@ -193,18 +186,18 @@ router.put('/:id', async (req, res) => {
             claimant_id,
             description: description.trim()
         })
-
     } catch (err) {
         res.status(500).json({
             error: err.message
         })
     }
-})
+}
 
-router.delete('/:id', async (req, res) => {
+const deleteClaim = async (req, res) => {
     try {
         const [result] = await pool.query(
-            'DELETE FROM claim WHERE id = ?',
+            `DELETE FROM claim
+            WHERE id = ?`,
             [req.params.id]
         )
 
@@ -217,13 +210,19 @@ router.delete('/:id', async (req, res) => {
         res.json({
             message: 'Claim deleted'
         })
-
     } catch (err) {
         res.status(500).json({
             error: err.message
         })
     }
-})
+}
+
+router.post('/', createClaim)
+router.get('/user/:userId', getUserClaims)
+router.get('/report/:reportId', getReportClaims)
+router.get('/:id', getClaimById)
+router.patch('/:id/status', updateClaimStatus)
+router.put('/:id', updateClaim)
+router.delete('/:id', deleteClaim)
 
 module.exports = router
-

@@ -1,10 +1,26 @@
-import {
-    formatReportDate,
-    getReportDescription,
-    getReportImageUrl
-} from "../../api/reports"
-
 import "./ReportCard.css"
+
+const API_URL = "http://localhost:5000"
+
+function getReportImageUrl(report) {
+    return report.has_image ? `${API_URL}/reports/${report.id}/image` : ""
+}
+
+function getReportDescription(report) {
+    return report.description || report.item_description || "No description provided."
+}
+
+function formatReportDate(date) {
+    if (!date) {
+        return "Unknown date"
+    }
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    }).format(new Date(date))
+}
 
 function ReportCard({ item, onDetails }) {
     const imageUrl = getReportImageUrl(item)

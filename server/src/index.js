@@ -4,6 +4,8 @@ const cors = require('cors')
 const reportsRouter = require('./routes/reports.routes')
 const authRouter = require('./routes/auth.routes')
 const claimsRouter = require('./routes/claims.routes')
+const messagesRouter = require('./routes/messages.routes')
+const matchesRouter = require('./routes/matches.routes')
 
 const app = express()
 
@@ -17,5 +19,7 @@ app.get('/', (req, res) => {
 app.use('/reports', reportsRouter)
 app.use('/auth', authRouter)
 app.use('/claims', claimsRouter)
+app.use('/messages', messagesRouter)
+app.use('/matches', matchesRouter)
 
 app.listen(5000, () => console.log('Server running'))

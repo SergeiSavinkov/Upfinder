@@ -13,10 +13,10 @@
 }
 
 .create-report-form {
-    width: min(960px, 100%);
+    width: min(1000px, 100%);
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
     padding: 22px;
     background: #ffffff;
     border: 1px solid #d9e2ef;
@@ -35,8 +35,8 @@
 
 .create-report-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.95fr);
-    gap: 22px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px;
     align-items: start;
 }
 
@@ -49,7 +49,7 @@
 
 .create-report-media-column {
     border-left: 1px solid #e6eef8;
-    padding-left: 22px;
+    padding-left: 28px;
 }
 
 .create-report-form label {
@@ -65,6 +65,7 @@
 .create-report-form select,
 .create-report-form textarea {
     width: 100%;
+    min-height: 50px;
     box-sizing: border-box;
     border: 1px solid #cfd8e3;
     border-radius: 6px;
@@ -84,6 +85,7 @@
 
 .create-report-form textarea {
     resize: vertical;
+    min-height: 156px;
 }
 
 .create-report-field-row {
@@ -111,6 +113,67 @@
     color: #667085;
     font-weight: 600;
     overflow: hidden;
+}
+
+.create-report-suggest-field {
+    position: relative;
+}
+
+.create-report-suggest {
+    position: relative;
+}
+
+.create-report-suggest input {
+    padding-right: 44px;
+}
+
+.create-report-suggest-toggle {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    width: 42px;
+    height: calc(100% - 2px);
+    border: none;
+    border-left: 1px solid #e6eef8;
+    border-radius: 0 6px 6px 0;
+    background: #ffffff;
+    color: #1f2937;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.create-report-suggest-toggle:hover {
+    background: #f4f7fb;
+}
+
+.create-report-suggest-menu {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid #cfd8e3;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14);
+}
+
+.create-report-suggest-menu button {
+    width: 100%;
+    border: none;
+    background: #ffffff;
+    color: #1f2937;
+    padding: 11px 12px;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.create-report-suggest-menu button:hover {
+    background: #e6eef8;
 }
 
 .create-report-image-preview img {

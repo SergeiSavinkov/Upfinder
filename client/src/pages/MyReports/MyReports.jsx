@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import ReportFilters from "../../components/ReportFilters/ReportFilters"
-import { deleteReport as removeReport, fetchReports, formatReportDate, getReportDescription, getReportImageUrl } from "../../api/reports"
 import "../Dashboard/Dashboard.css"
 import "../../components/ReportCard/ReportCard.css"
 import "./MyReports.css"
+
+const API_URL = "http://localhost:5000"
 
 function normalize(value) {
     return String(value || "").toLowerCase().trim()
@@ -14,6 +15,26 @@ function normalize(value) {
 
 function getUniqueOptions(items, key) {
     return [...new Set(items.map(item => item[key]).filter(Boolean))]
+}
+
+function getReportImageUrl(report) {
+    return report.has_image ? `${API_URL}/reports/${report.id}/image` : ""
+}
+
+function getReportDescription(report) {
+    return report.description || report.item_description || "No description provided."
+}
+
+function formatReportDate(date) {
+    if (!date) {
+        return "Unknown date"
+    }
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    }).format(new Date(date))
 }
 
 function MyReportCard({ item, onEdit, onReview, onDelete }) {
@@ -67,7 +88,6 @@ function MyReports() {
     const user = JSON.parse(localStorage.getItem("user") || "null")
 
     const [reports, setReports] = useState([])
-    const [filteredReports, setFilteredReports] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
 
@@ -84,7 +104,13 @@ function MyReports() {
     useEffect(() => {
         async function loadReports() {
             try {
-                const data = await fetchReports()
+                const res = await fetch(`${API_URL}/reports`)
+                const data = await res.json()
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Failed to load reports")
+                }
+
                 setReports(data.filter(item => item.user_id === user?.id))
             } catch (err) {
                 setError(err.message)
@@ -96,60 +122,56 @@ function MyReports() {
         loadReports()
     }, [user?.id])
 
-    useEffect(() => {
-        let result = [...reports]
+    let filteredReports = [...reports]
 
-        const search = normalize(filters.search)
+    const search = normalize(filters.search)
 
-        if (search) {
-            result = result.filter(item => {
-                const name = normalize(item.item_name)
-                const description = normalize(getReportDescription(item))
-                const category = normalize(item.category_name)
-                const location = normalize(item.location_name)
+    if (search) {
+        filteredReports = filteredReports.filter(item => {
+            const name = normalize(item.item_name)
+            const description = normalize(getReportDescription(item))
+            const category = normalize(item.category_name)
+            const location = normalize(item.location_name)
 
-                return (
-                    name.includes(search) ||
-                    description.includes(search) ||
-                    category.includes(search) ||
-                    location.includes(search)
-                )
-            })
-        }
-
-        if (filters.reportType !== "all") {
-            result = result.filter(item => item.report_type === filters.reportType)
-        }
-
-        if (filters.category !== "all") {
-            result = result.filter(item => item.category_name === filters.category)
-        }
-
-        if (filters.location !== "all") {
-            result = result.filter(item => item.location_name === filters.location)
-        }
-
-        if (filters.dateFrom) {
-            result = result.filter(item => {
-                return new Date(item.created_at) >= new Date(filters.dateFrom)
-            })
-        }
-
-        if (filters.dateTo) {
-            result = result.filter(item => {
-                return new Date(item.created_at) <= new Date(filters.dateTo)
-            })
-        }
-
-        result.sort((a, b) => {
-            const dateA = new Date(a.created_at)
-            const dateB = new Date(b.created_at)
-
-            return filters.sort === "oldest" ? dateA - dateB : dateB - dateA
+            return (
+                name.includes(search) ||
+                description.includes(search) ||
+                category.includes(search) ||
+                location.includes(search)
+            )
         })
+    }
 
-        setFilteredReports(result)
-    }, [reports, filters])
+    if (filters.reportType !== "all") {
+        filteredReports = filteredReports.filter(item => item.report_type === filters.reportType)
+    }
+
+    if (filters.category !== "all") {
+        filteredReports = filteredReports.filter(item => item.category_name === filters.category)
+    }
+
+    if (filters.location !== "all") {
+        filteredReports = filteredReports.filter(item => item.location_name === filters.location)
+    }
+
+    if (filters.dateFrom) {
+        filteredReports = filteredReports.filter(item => {
+            return new Date(item.created_at) >= new Date(filters.dateFrom)
+        })
+    }
+
+    if (filters.dateTo) {
+        filteredReports = filteredReports.filter(item => {
+            return new Date(item.created_at) <= new Date(filters.dateTo)
+        })
+    }
+
+    filteredReports.sort((a, b) => {
+        const dateA = new Date(a.created_at)
+        const dateB = new Date(b.created_at)
+
+        return filters.sort === "oldest" ? dateA - dateB : dateB - dateA
+    })
 
     const handleFilterChange = ({ target: { name, value } }) => {
         setFilters(prev => ({
@@ -182,7 +204,15 @@ function MyReports() {
 
     const deleteReport = async item => {
         try {
-            await removeReport(item.id)
+            const res = await fetch(`${API_URL}/reports/${item.id}`, {
+                method: "DELETE"
+            })
+            const data = await res.json()
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to delete report")
+            }
+
             setReports(prev => prev.filter(report => report.id !== item.id))
         } catch (err) {
             setError(err.message)

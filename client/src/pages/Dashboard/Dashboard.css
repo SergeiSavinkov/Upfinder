@@ -47,11 +47,6 @@
   grid-row: 1;
 }
 
-.nav-leaderboard {
-  grid-column: 1;
-  grid-row: 2;
-}
-
 .nav-profile {
   grid-column: 2;
   grid-row: 2;
@@ -189,7 +184,6 @@
   }
 
   .nav-my-report,
-  .nav-leaderboard,
   .nav-profile,
   .nav-notifications,
   .nav-logout,

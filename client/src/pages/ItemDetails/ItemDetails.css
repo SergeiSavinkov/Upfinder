@@ -1,16 +1,16 @@
-.found-details-page {
+.item-details-page {
     min-height: 100vh;
     background: #f4f7fb;
     color: #1f2937;
 }
 
-.found-details-main {
+.item-details-main {
     width: min(1180px, calc(100% - 40px));
     margin: 0 auto;
     padding: 32px 0 40px;
 }
 
-.found-details-heading {
+.item-details-heading {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,21 +18,21 @@
     margin-bottom: 22px;
 }
 
-.found-details-heading span {
+.item-details-heading span {
     color: #667085;
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
 }
 
-.found-details-heading h2 {
+.item-details-heading h2 {
     margin: 4px 0 0;
     color: #0b3c6d;
     font-size: 28px;
     font-weight: 700;
 }
 
-.found-status {
+.item-status {
     background: #e6eef8;
     color: #145da0;
     padding: 8px 12px;
@@ -40,7 +40,7 @@
     border: 1px solid #c8d7ea;
 }
 
-.found-details-card {
+.item-details-card {
     background: #ffffff;
     border: 1px solid #d9e2ef;
     border-radius: 8px;
@@ -52,13 +52,13 @@
     transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
-.found-details-card:hover {
+.item-details-card:hover {
     border-color: #b9c9dc;
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.09);
     transform: translateY(-2px);
 }
 
-.found-item-image {
+.item-details-image {
     aspect-ratio: 4 / 3;
     background: #f8fafc;
     display: grid;
@@ -69,31 +69,31 @@
     border-right: 1px solid #e5eaf1;
 }
 
-.found-item-image img {
+.item-details-image img {
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
 
-.found-item-info {
+.item-details-info {
     min-width: 0;
     padding: 20px;
 }
 
-.found-item-info h3,
-.found-description-card h3 {
+.item-details-info h3,
+.item-description-card h3 {
     margin: 0 0 14px;
     color: #1f2937;
     font-size: 20px;
 }
 
-.found-info-list {
+.item-info-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
 }
 
-.found-info-list p {
+.item-info-list p {
     margin: 0;
     padding: 12px;
     background: #f8fafc;
@@ -103,7 +103,7 @@
     line-height: 1.4;
 }
 
-.found-location-box {
+.item-location-box {
     margin-top: 14px;
     padding: 14px;
     background: #e6eef8;
@@ -114,25 +114,19 @@
     gap: 6px;
 }
 
-.found-location-box span {
+.item-location-box span {
     color: #667085;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
 }
 
-.found-location-box strong {
+.item-location-box strong {
     color: #0b3c6d;
     font-size: 18px;
 }
 
-.found-location-box p {
-    margin: 0;
-    color: #344054;
-    line-height: 1.4;
-}
-
-.found-description-card {
+.item-description-card {
     margin-top: 22px;
     padding: 20px;
     background: #ffffff;
@@ -141,12 +135,12 @@
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
 }
 
-.found-description-card p {
+.item-description-card p {
     color: #344054;
     line-height: 1.5;
 }
 
-.found-details-actions {
+.item-details-actions {
     margin-top: 22px;
     padding: 18px;
     background: #ffffff;
@@ -157,7 +151,7 @@
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
 }
 
-.found-details-actions button {
+.item-details-actions button {
     border: none;
     padding: 10px 16px;
     border-radius: 6px;
@@ -167,31 +161,31 @@
     transition: background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 
-.found-primary-action {
+.item-primary-action {
     background: #145da0;
     color: #ffffff;
 }
 
-.found-secondary-action {
+.item-secondary-action {
     background: #e6eef8;
     color: #145da0;
 }
 
-.found-details-actions button:hover {
+.item-details-actions button:hover {
     background: #0b3c6d;
     color: #ffffff;
     box-shadow: 0 8px 18px rgba(11, 60, 109, 0.18);
     transform: translateY(-1px);
 }
 
-.found-details-actions button:disabled {
+.item-details-actions button:disabled {
     opacity: 0.55;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
 }
 
-.found-details-warning {
+.item-details-warning {
     width: fit-content;
     margin: 12px 0 0 18px;
     padding: 10px 14px;
@@ -203,21 +197,21 @@
 }
 
 @media (max-width: 800px) {
-    .found-details-card {
+    .item-details-card {
         grid-template-columns: 1fr;
     }
 
-    .found-item-image {
+    .item-details-image {
         border-right: none;
         border-bottom: 1px solid #e5eaf1;
     }
 
-    .found-info-list {
+    .item-info-list {
         grid-template-columns: 1fr;
     }
 
-    .found-details-heading,
-    .found-details-actions {
+    .item-details-heading,
+    .item-details-actions {
         flex-direction: column;
         align-items: stretch;
     }
