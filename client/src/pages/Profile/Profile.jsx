@@ -5,6 +5,10 @@ import "./Profile.css"
 
 const API_URL = "http://localhost:5000"
 
+function getUserRole(role) {
+    return role === "staff" ? "staff" : "student"
+}
+
 function Profile() {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null")
 
@@ -12,7 +16,7 @@ function Profile() {
         first_name: savedUser?.first_name || "",
         last_name: savedUser?.last_name || "",
         email: savedUser?.email || "",
-        role: savedUser?.role || "student",
+        role: getUserRole(savedUser?.role),
         password: ""
     })
 
@@ -103,7 +107,6 @@ function Profile() {
                         <select name="role" value={form.role} onChange={handleChange}>
                             <option value="student">Student</option>
                             <option value="staff">Staff</option>
-                            <option value="admin">Admin</option>
                         </select>
                     </label>
 

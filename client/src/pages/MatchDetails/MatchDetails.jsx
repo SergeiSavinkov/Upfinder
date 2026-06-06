@@ -90,7 +90,6 @@ function MatchDetails() {
     }
 
     const ownsLostReport = Number(user?.id) === Number(match.lost_report.user_id)
-    const currentReport = ownsLostReport ? match.lost_report : match.found_report
     const contactReport = ownsLostReport ? match.found_report : match.lost_report
 
     const openChat = () => {
@@ -125,11 +124,11 @@ function MatchDetails() {
                 </section>
 
                 <footer className="match-detail-actions">
-                    {currentReport.report_type === "found" ? (
+                    {contactReport.report_type === "found" ? (
                         <button
                             type="button"
-                            onClick={() => navigate(`/claim-form/${currentReport.id}`, {
-                                state: { item: currentReport }
+                            onClick={() => navigate(`/claim-form/${contactReport.id}`, {
+                                state: { item: contactReport }
                             })}
                         >
                             Add Claim

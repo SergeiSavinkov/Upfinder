@@ -12,6 +12,7 @@ import ClaimReview from "./pages/ClaimReview/ClaimReview"
 import Chat from "./pages/Chat/Chat"
 import MatchResults from "./pages/MatchResults/MatchResults"
 import MatchDetails from "./pages/MatchDetails/MatchDetails"
+import Notifications from "./pages/Notifications/Notifications"
 
 export default function AppRouter() {
     return (
@@ -30,14 +31,12 @@ export default function AppRouter() {
                 <Route path="/claim-form/:id/edit/:claimId" element={<ClaimForm />} />
                 <Route path="/item-details/:id" element={<ItemDetails />} />
                 <Route path="/found-item-details/:id" element={<ItemDetails />} />
-                <Route path="/found-item-details" element={<ItemDetails />} />
+                <Route path="/notifications" element={<Notifications />} />
                 <Route path="/lost-item-details/:id" element={<ItemDetails />} />
-                <Route path="lost-item-details/:id" element={<ItemDetails />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/claim-review/:id" element={<ClaimReview />} />
                 <Route path="/match-results/:id" element={<MatchResults />} />
                 <Route path="/match-details/:id" element={<MatchDetails />} />
-                <Route path="/lost-item-details" element={<ItemDetails />} />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </BrowserRouter>

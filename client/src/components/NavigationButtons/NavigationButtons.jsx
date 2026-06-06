@@ -3,6 +3,12 @@ import "./NavigationButtons.css"
 
 function NavigationButtons({ backTo }) {
     const navigate = useNavigate()
+
+    const logOut = () => {
+        localStorage.removeItem("user")
+        navigate("/login")
+    }
+
     const goBack = () => {
         if (backTo) {
             navigate(backTo)
@@ -15,7 +21,7 @@ function NavigationButtons({ backTo }) {
     return (
         <div className="navigation-buttons">
             <button onClick={goBack}>Back</button>
-            <button onClick={() => navigate("/login")}>Log Out</button>
+            <button onClick={logOut}>Log Out</button>
         </div>
     )
 }

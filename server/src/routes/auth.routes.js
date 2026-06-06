@@ -3,21 +3,26 @@ const pool = require('../db/database')
 
 const router = express.Router()
 
+const getUserRole = role => {
+  return role === 'staff' ? 'staff' : 'student'
+}
+
 const register = async (req, res) => {
   const { first_name, last_name, email, password, password_hash, role } = req.body
   const userPassword = password_hash || password
+  const userRole = getUserRole(role)
 
   try {
     const [result] = await pool.query(
       `INSERT INTO user (first_name, last_name, email, password_hash, role)
       VALUES (?, ?, ?, ?, ?)`,
-      [first_name, last_name, email, userPassword, role || 'student']
+      [first_name, last_name, email, userPassword, userRole]
     )
 
     res.json({
       id: result.insertId,
       email,
-      role: role || 'student'
+      role: userRole
     })
   } catch (err) {
     res.status(500).json({
@@ -64,13 +69,14 @@ const updateUser = async (req, res) => {
   const { id } = req.params
   const { first_name, last_name, email, password, password_hash, role } = req.body
   const userPassword = password_hash || password || null
+  const userRole = getUserRole(role)
 
   try {
     const [result] = await pool.query(
       `UPDATE user
       SET first_name = ?, last_name = ?, email = ?, role = ?, password_hash = COALESCE(?, password_hash)
       WHERE id = ?`,
-      [first_name, last_name, email, role || 'student', userPassword, id]
+      [first_name, last_name, email, userRole, userPassword, id]
     )
 
     if (result.affectedRows === 0) {

@@ -13,7 +13,7 @@ function Login() {
     const [message, setMessage] = useState('')
     const navigate = useNavigate()
 
-    const handleChange = ({ target: {name, value } }) => {
+    const handleChange = ({ target: { name, value } }) => {
         setForm(prev => ({
             ...prev, [name]: value
         }))
@@ -43,7 +43,7 @@ function Login() {
 
     return (
         <div className="login-page">
-            <Header />
+            <Header showUserInfo={false} />
 
             <div className="login-container">
                 <h2>Login</h2>

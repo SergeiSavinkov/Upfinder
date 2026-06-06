@@ -127,6 +127,11 @@ function Dashboard() {
         })
     }
 
+    const logOut = () => {
+        localStorage.removeItem("user")
+        navigate("/login")
+    }
+
     const openDetails = item => {
         navigate(`/item-details/${item.id}`, {
             state: { item }
@@ -139,15 +144,15 @@ function Dashboard() {
     return (
         <div className="dashboard-page">
             <div className="dashboard-header-wrap">
-                <Header />
-
-                <nav className="dashboard-header-nav" aria-label="Dashboard navigation">
-                    <button className="nav-my-report" onClick={() => navigate("/my-reports")}>My Report</button>
-                    <button className="nav-profile" onClick={() => navigate("/profile")}>Profile</button>
-                    <button className="nav-notifications">Notifications</button>
-                    <button className="nav-logout" onClick={() => navigate("/login")}>Log Out</button>
-                    <button className="nav-my-claims" onClick={() => navigate("/my-claims")}>My Claims</button>
-                </nav>
+                <Header>
+                    <nav className="dashboard-header-nav" aria-label="Dashboard navigation">
+                        <button onClick={() => navigate("/my-reports")}>My Report</button>
+                        <button onClick={() => navigate("/my-claims")}>My Claims</button>
+                        <button onClick={() => navigate("/notifications")}>Notifications</button>
+                        <button onClick={() => navigate("/profile")}>Profile</button>
+                        <button onClick={logOut}>Log Out</button>
+                    </nav>
+                </Header>
             </div>
 
             <main className="dashboard-main">

@@ -17,7 +17,7 @@ async function readJsonResponse(res, fallbackMessage) {
 }
 
 function getContactName(contact) {
-    return contact.first_name || contact.email || "User"
+    return contact?.email || "User"
 }
 
 function Chat() {
@@ -44,7 +44,17 @@ function Chat() {
                 const data = await readJsonResponse(res, "Failed to load chats")
 
                 setContacts(data)
-                setActiveContact(state?.contact || data[0] || null)
+
+                // Если есть state contact, найти его в загруженных контактах чтобы получить полные данные
+                if (state?.contact) {
+                    const fullContact = data.find(c =>
+                        Number(c.user_id) === Number(state.contact.user_id) &&
+                        Number(c.item_report_id) === Number(state.contact.item_report_id)
+                    )
+                    setActiveContact(fullContact || state.contact)
+                } else {
+                    setActiveContact(data[0] || null)
+                }
             } catch (err) {
                 setError(err.message)
             } finally {

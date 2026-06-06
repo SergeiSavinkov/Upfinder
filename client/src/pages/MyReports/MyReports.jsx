@@ -227,7 +227,7 @@ function MyReports() {
             <div className="dashboard-header-wrap">
                 <Header>
                     <div className="my-reports-header-nav" aria-label="My reports navigation">
-                        <button type="button">Chat</button>
+                        <button type="button" onClick={() => navigate("/chat")}>Chat</button>
                         <NavigationButtons backTo="/dashboard" />
                     </div>
                 </Header>

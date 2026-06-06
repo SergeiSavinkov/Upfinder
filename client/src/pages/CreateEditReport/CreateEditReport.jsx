@@ -81,8 +81,7 @@ function CreateEditReport() {
         item_description: "",
         report_type: "lost",
         category_name: "",
-        location_name: "",
-        status: "open"
+        location_name: ""
     })
 
     const [categories, setCategories] = useState([])
@@ -130,8 +129,7 @@ function CreateEditReport() {
                     item_description: data.item_description || data.description || "",
                     report_type: data.report_type || "lost",
                     category_name: data.category_name || "",
-                    location_name: data.location_name || "",
-                    status: data.status || "open"
+                    location_name: data.location_name || ""
                 })
                 setImagePreview(getReportImageUrl(data))
             } catch (err) {
@@ -185,7 +183,6 @@ function CreateEditReport() {
             body.append("report_type", form.report_type)
             body.append("category_name", form.category_name)
             body.append("location_name", form.location_name)
-            body.append("status", form.status)
 
             if (imageFile) {
                 body.append("image", imageFile)
@@ -269,15 +266,6 @@ function CreateEditReport() {
                             <label>
                                 Description
                                 <textarea name="item_description" value={form.item_description} onChange={handleChange} placeholder="Describe the item" rows="5" />
-                            </label>
-
-                            <label>
-                                Status
-                                <select name="status" value={form.status} onChange={handleChange}>
-                                    <option value="open">Open</option>
-                                    <option value="returned">Returned</option>
-                                    <option value="closed">Closed</option>
-                                </select>
                             </label>
                         </div>
                     </div>

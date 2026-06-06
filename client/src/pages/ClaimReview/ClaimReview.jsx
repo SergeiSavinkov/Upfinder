@@ -106,6 +106,9 @@ function ClaimReview() {
     }
 
     const isOwner = item?.user_id && user?.id && Number(item.user_id) === Number(user.id)
+    const hasApprovedClaim = claims.some(
+        claim => claim.status === "approved"
+    )
 
     return (
         <div className="dashboard-page claim-review-page">
@@ -166,7 +169,13 @@ function ClaimReview() {
                                     </div>
 
                                     <div className="claim-review-actions">
-                                        <button type="button" className="approve-claim-button" disabled={claim.status === "approved"} onClick={() => changeStatus(claim, "approved")}>
+                                        <button type="button" className="approve-claim-button"
+                                            disabled={
+                                                claim.status === "approved" ||
+                                                (hasApprovedClaim && claim.status !== "approved")
+                                            }
+                                            onClick={() => changeStatus(claim, "approved")}
+                                        >
                                             Approve
                                         </button>
 

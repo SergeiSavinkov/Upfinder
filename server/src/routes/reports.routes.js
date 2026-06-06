@@ -9,7 +9,7 @@ const upload = multer({
 })
 
 const createReport = async (req, res) => {
-  const { user_id, item_name, item_description, report_type, category_name, location_name, status } = req.body
+  const { user_id, item_name, item_description, report_type, category_name, location_name } = req.body
 
   if (!user_id || !item_name || !item_description || !report_type || !category_name || !location_name) {
     return res.status(400).json({
@@ -22,7 +22,7 @@ const createReport = async (req, res) => {
       `INSERT INTO item_report
       (user_id, item_name, item_description, report_type, category_name, location_name, status, image)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [user_id, item_name, item_description, report_type, category_name, location_name, status || 'open', req.file ? req.file.buffer : null]
+      [user_id, item_name, item_description, report_type, category_name, location_name, 'open', req.file ? req.file.buffer : null]
     )
 
     res.status(201).json({
@@ -33,7 +33,7 @@ const createReport = async (req, res) => {
       report_type,
       category_name,
       location_name,
-      status: status || 'open',
+      status: 'open',
       has_image: Boolean(req.file)
     })
   } catch (err) {
@@ -48,12 +48,9 @@ const getReports = async (req, res) => {
     const [reports] = await pool.query(
       `SELECT r.id, r.user_id, r.report_type, r.status, r.item_name, r.item_description,
       r.category_name, r.location_name, r.created_at, r.image IS NOT NULL AS has_image,
-      u.email
-
+      u.first_name, u.last_name, u.email
       FROM item_report r
-
       JOIN user u ON r.user_id = u.id
-
       ORDER BY r.created_at DESC`
     )
 
@@ -70,12 +67,9 @@ const getReportById = async (req, res) => {
     const [reports] = await pool.query(
       `SELECT r.id, r.user_id, r.report_type, r.status, r.item_name, r.item_description,
       r.category_name, r.location_name, r.created_at, r.updated_at, r.image IS NOT NULL AS has_image,
-      u.email
-
+      u.first_name, u.last_name, u.email
       FROM item_report r
-
       JOIN user u ON r.user_id = u.id
-
       WHERE r.id = ?`,
       [req.params.id]
     )
@@ -95,7 +89,7 @@ const getReportById = async (req, res) => {
 }
 
 const updateReport = async (req, res) => {
-  const { item_name, item_description, report_type, category_name, location_name, status } = req.body
+  const { item_name, item_description, report_type, category_name, location_name } = req.body
 
   if (!item_name || !item_description || !report_type || !category_name || !location_name) {
     return res.status(400).json({
@@ -104,7 +98,7 @@ const updateReport = async (req, res) => {
   }
 
   try {
-    const values = [item_name, item_description, report_type, category_name, location_name, status || 'open']
+    const values = [item_name, item_description, report_type, category_name, location_name]
     let imageSql = ''
 
     if (req.file) {
@@ -116,7 +110,7 @@ const updateReport = async (req, res) => {
 
     const [result] = await pool.query(
       `UPDATE item_report
-      SET item_name = ?, item_description = ?, report_type = ?, category_name = ?, location_name = ?, status = ?
+      SET item_name = ?, item_description = ?, report_type = ?, category_name = ?, location_name = ?
       ${imageSql}
       WHERE id = ?`,
       values
@@ -135,7 +129,6 @@ const updateReport = async (req, res) => {
       report_type,
       category_name,
       location_name,
-      status: status || 'open',
       has_image: Boolean(req.file)
     })
   } catch (err) {
@@ -174,6 +167,54 @@ const deleteReport = async (req, res) => {
 
   try {
     await connection.beginTransaction()
+
+    const [claims] = await connection.query(
+      `SELECT id
+      FROM claim
+      WHERE item_report_id = ?`,
+      [req.params.id]
+    )
+
+    const [messages] = await connection.query(
+      `SELECT id
+      FROM message
+      WHERE item_report_id = ?`,
+      [req.params.id]
+    )
+
+    const [matches] = await connection.query(
+      `SELECT id
+      FROM \`match\`
+      WHERE lost_report_id = ? OR found_report_id = ?`,
+      [req.params.id, req.params.id]
+    )
+
+    if (claims.length > 0) {
+      await connection.query(
+        `DELETE FROM notification
+        WHERE entity_type = 'claim'
+        AND entity_id IN (?)`,
+        [claims.map(claim => claim.id)]
+      )
+    }
+
+    if (messages.length > 0) {
+      await connection.query(
+        `DELETE FROM notification
+        WHERE entity_type = 'message'
+        AND entity_id IN (?)`,
+        [messages.map(message => message.id)]
+      )
+    }
+
+    if (matches.length > 0) {
+      await connection.query(
+        `DELETE FROM notification
+        WHERE entity_type = 'match'
+        AND entity_id IN (?)`,
+        [matches.map(match => match.id)]
+      )
+    }
 
     const [claimsResult] = await connection.query(
       `DELETE FROM claim

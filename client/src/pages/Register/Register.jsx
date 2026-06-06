@@ -41,7 +41,7 @@ function Register() {
     return (
         <div className="register-page">
 
-            <Header />
+            <Header showUserInfo={false} />
 
             <div className="register-container">
                 <div className="register-box">
@@ -59,7 +59,6 @@ function Register() {
                     <select className="register-role-select" name="role" onChange={handleChange}>
                         <option value="student">Student</option>
                         <option value="staff">Staff</option>
-                        <option value="admin">Admin</option>
                     </select>
                 </div>
 

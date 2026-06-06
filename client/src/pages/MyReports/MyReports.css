@@ -1,7 +1,9 @@
 .my-reports-header-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .my-reports-header-nav button {
@@ -13,11 +15,14 @@
   cursor: pointer;
   font-weight: 600;
   min-width: 112px;
-  height: 36px;
+  min-height: 40px;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .my-reports-header-nav button:hover {
   background: #111827;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+  transform: scale(1.04);
 }
 
 .my-report-card .item-actions {
@@ -40,13 +45,11 @@
 
 @media (max-width: 900px) {
   .my-reports-header-nav {
-    display: grid;
-    grid-template-columns: 1fr;
     width: 100%;
+    justify-content: flex-end;
   }
 
   .my-reports-header-nav button {
-    width: 100%;
     min-width: 0;
   }
 }
