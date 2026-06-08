@@ -6,8 +6,7 @@ import ReportFilters from "../../components/ReportFilters/ReportFilters"
 import "../Dashboard/Dashboard.css"
 import "../../components/ReportCard/ReportCard.css"
 import "./MyReports.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config"
 
 function normalize(value) {
     return String(value || "").toLowerCase().trim()

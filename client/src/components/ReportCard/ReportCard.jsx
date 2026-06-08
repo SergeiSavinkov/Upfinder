@@ -1,6 +1,5 @@
 import "./ReportCard.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config";
 
 function getReportImageUrl(report) {
     return report.has_image ? `${API_URL}/reports/${report.id}/image` : ""

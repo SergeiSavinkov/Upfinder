@@ -3,8 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import "./MatchResults.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config"
 
 function MatchResults() {
     const { id } = useParams()

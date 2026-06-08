@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import "./Chat.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config";
 
 async function readJsonResponse(res, fallbackMessage) {
     const data = await res.json()
@@ -187,7 +186,7 @@ function Chat() {
                                 </form>
                             </>
                         ) : (
-                            <div className="chat-no-contact">Select a contact to start chatting.</div>
+                            <div className="chat-no-contact"></div>
                         )}
                     </section>
                 </section>

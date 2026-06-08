@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import "./Login.css"
 import Header from "../../components/Header/Header"
+import { API_URL } from "../../config"
 
 function Login() {
     const [form, setForm] = useState({
@@ -20,7 +21,7 @@ function Login() {
     }
 
     const submit = async () => {
-        const res = await fetch('http://localhost:5000/auth/login', {
+        const res = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form)

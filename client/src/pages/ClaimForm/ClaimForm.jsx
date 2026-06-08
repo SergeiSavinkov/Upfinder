@@ -4,8 +4,7 @@ import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import "../../components/ReportCard/ReportCard.css"
 import "./ClaimForm.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config";
 
 function getReportImageUrl(report) {
     return report.has_image ? `${API_URL}/reports/${report.id}/image` : ""

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import "./Register.css"
 import Header from "../../components/Header/Header"
+import { API_URL } from "../../config"
 
 function Register() {
     const [form, setForm] = useState({
@@ -23,7 +24,7 @@ function Register() {
     }
 
     const submit = async () => {
-        const res = await fetch('http://localhost:5000/auth/register', {
+        const res = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form)

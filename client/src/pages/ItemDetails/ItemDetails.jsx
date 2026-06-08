@@ -3,8 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import "./ItemDetails.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config";
 
 function getReportImageUrl(report) {
     return report.has_image ? `${API_URL}/reports/${report.id}/image` : ""
