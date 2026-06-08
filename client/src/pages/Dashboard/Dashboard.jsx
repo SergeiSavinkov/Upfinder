@@ -4,8 +4,7 @@ import Header from "../../components/Header/Header"
 import ReportCard from "../../components/ReportCard/ReportCard"
 import ReportFilters from "../../components/ReportFilters/ReportFilters"
 import "./Dashboard.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config";
 
 function normalize(value) {
     return String(value || "").toLowerCase().trim()

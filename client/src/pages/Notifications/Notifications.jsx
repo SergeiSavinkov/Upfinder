@@ -4,8 +4,7 @@ import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import "../Dashboard/Dashboard.css"
 import "./Notifications.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config"
 
 function getTargetUrl(notification) {
     return notification.target_url || "/dashboard"

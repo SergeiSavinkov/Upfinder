@@ -24,4 +24,4 @@ app.use('/messages', messagesRouter)
 app.use('/matches', matchesRouter)
 app.use('/notifications', notificationsRouter)
 
-app.listen(5000, () => console.log('Server running'))
+app.listen(30004, () => console.log('Server running on port 30004'))

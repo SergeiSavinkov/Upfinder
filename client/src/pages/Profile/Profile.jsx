@@ -2,8 +2,7 @@ import { useState } from "react"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import "./Profile.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config"
 
 function getUserRole(role) {
     return role === "staff" ? "staff" : "student"

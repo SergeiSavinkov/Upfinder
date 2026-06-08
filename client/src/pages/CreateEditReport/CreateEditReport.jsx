@@ -3,8 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import NavigationButtons from "../../components/NavigationButtons/NavigationButtons"
 import "./CreateEditReport.css"
-
-const API_URL = "http://localhost:5000"
+import { API_URL } from "../../config";
 
 function getUniqueOptions(items, key) {
     return [...new Set(items.map(item => item[key]).filter(Boolean))]
